@@ -1,0 +1,118 @@
+.backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 290000;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: rgba(24, 34, 22, 0.16);
+  cursor: default;
+}
+
+.backdrop * {
+  cursor: default;
+}
+
+.card {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 10px;
+  width: min(320px, 100%);
+  padding: 12px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid rgba(32, 48, 31, 0.08);
+  color: #20301f;
+}
+
+.nameRow {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 10px 4px 8px;
+  border-radius: 14px;
+  background: rgba(32, 48, 31, 0.05);
+}
+
+.input {
+  flex: 1;
+  min-width: 0;
+  height: 36px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 17px;
+  font-weight: 600;
+  outline: none;
+  cursor: text;
+}
+
+.input::placeholder {
+  color: rgba(32, 48, 31, 0.35);
+}
+
+.breeds {
+  display: flex;
+  gap: 6px;
+}
+
+.breed {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  padding: 0;
+  border: 0;
+  border-radius: 14px;
+  background: rgba(32, 48, 31, 0.05);
+  transition: background-color 0.14s ease, box-shadow 0.14s ease, transform 0.14s ease;
+}
+
+.breed,
+.confirm {
+  cursor: pointer;
+}
+
+.breed:hover {
+  background: rgba(32, 48, 31, 0.1);
+}
+
+.breed[data-selected='true'] {
+  background: #ffffff;
+  box-shadow: inset 0 0 0 2px #1f2a1c;
+}
+
+.breed:active,
+.confirm:active {
+  transform: scale(0.94);
+}
+
+.confirm {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: #1f2a1c;
+  color: #ffffff;
+  transition: transform 0.14s ease;
+}
+
+.breed:focus-visible,
+.confirm:focus-visible {
+  outline: 2px solid #20301f;
+  outline-offset: 2px;
+}
+
+@media (max-width: 380px) {
+  .breed,
+  .confirm {
+    width: 40px;
+    height: 40px;
+  }
+}

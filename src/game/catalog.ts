@@ -76,10 +76,12 @@ export const breedProfiles: Record<CatBreed, BreedProfile> = {
   },
 }
 
+export type CoatLook = 'tuxedo' | 'ginger' | 'cream' | 'silver' | 'white' | 'bronze' | 'silverSpotted'
+
 interface RosterEntry {
   name: string
   breed: CatBreed
-  look: 'tuxedo' | 'ginger' | 'cream' | 'silver' | 'white' | 'bronze' | 'silverSpotted'
+  look: CoatLook
 }
 
 const roster: RosterEntry[] = [
@@ -186,7 +188,7 @@ function createCoat(entry: RosterEntry, random: Random, sizeScale: number): CatC
   }
 }
 
-function createPersonality(breed: CatBreed, random: Random): Personality {
+export function createPersonality(breed: CatBreed, random: Random): Personality {
   const base = breedProfiles[breed]
   const vary = (value: number, spread: number) => Math.max(0.02, Math.min(1, value + random.range(-spread, spread)))
   return {
@@ -200,6 +202,25 @@ function createPersonality(breed: CatBreed, random: Random): Personality {
     zoominess: vary(base.zoominess, 0.2),
     curiosity: vary(base.curiosity, 0.2),
   }
+}
+
+const warmLooks = new Set<CoatLook>(['ginger', 'cream', 'bronze'])
+
+export function lookOfCoat(coat: CatCoat): CoatLook {
+  if (coat.breed === 'persian') return coat.baseColor === '#b8bcc4' ? 'silver' : coat.baseColor === '#f6f3ee' ? 'white' : 'cream'
+  if (coat.breed === 'egyptianMau') return coat.baseColor === '#c29563' ? 'bronze' : 'silverSpotted'
+  return coat.baseColor === '#d98b3f' ? 'ginger' : 'tuxedo'
+}
+
+export function lookForBreed(look: CoatLook, breed: CatBreed): CoatLook {
+  const warm = warmLooks.has(look)
+  if (breed === 'persian') return warm ? 'cream' : look === 'white' ? 'white' : 'silver'
+  if (breed === 'egyptianMau') return warm ? 'bronze' : 'silverSpotted'
+  return warm ? 'ginger' : 'tuxedo'
+}
+
+export function createBreedCoat(breed: CatBreed, look: CoatLook, random: Random, sizeScale: number): CatCoat {
+  return createCoat({ name: '', breed, look }, random, sizeScale)
 }
 
 export function createCatProfiles(count: number, random: Random, sizeScale: number): CatProfile[] {

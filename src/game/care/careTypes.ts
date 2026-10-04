@@ -3,6 +3,8 @@ import type { StepContext } from '../memory'
 
 export type CareItemKind = 'fish' | 'milk' | 'yarn' | 'brush' | 'treat'
 
+export type TrayItemKind = CareItemKind | 'collar'
+
 export type CareNeed = 'hunger' | 'thirst' | 'play' | 'affection'
 
 export type CatchKind = 'loose' | 'stolen'

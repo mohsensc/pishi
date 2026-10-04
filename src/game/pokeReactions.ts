@@ -14,6 +14,7 @@ import { isInPond, pondReach } from './physics'
 import { depthScale } from './projection'
 import { add, closestOnSegment, distance, lerpVec, normalize, scale, subtract } from './vector'
 import type { CatState, PropKind, PropState, Vec } from './types'
+import { shopItemPokeReactions } from './shopItems/shopItemPokes'
 
 type PokeReaction = (prop: PropState, point: Vec, context: StepContext) => void
 
@@ -214,6 +215,7 @@ export const pokeReactions: Record<PropKind, PokeReaction> = {
   rock: bounceRock,
   picnicBlanket: rippleBlanket,
   cushion: fluffCushion,
+  ...shopItemPokeReactions,
 }
 
 export function evictOccupants(prop: PropState, context: StepContext): number {

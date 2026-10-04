@@ -12,6 +12,8 @@ import {
   POND_DRIFT_SPEED,
 } from './constants'
 import { propSolidHeight } from './layout'
+import { pathStyleAt } from './landscape/pathGrid'
+import type { PathStyle } from './landscape/landscapeTypes'
 import type { BallState, PropState, Vec, World } from './types'
 import { length } from './vector'
 
@@ -44,6 +46,12 @@ function bounceOffWalls(ball: BallState, world: World): void {
 }
 
 const dockBallClearance = 84
+const pathFriction: Record<PathStyle, number> = { gravel: 1.45, stone: 0.7 }
+
+function groundFrictionAt(world: World, point: Vec): number {
+  const style = world.landscape ? pathStyleAt(world.landscape.pathCells, world.width, world.height, point) : null
+  return BALL_GROUND_FRICTION * (style ? pathFriction[style] : 1)
+}
 
 function bounceOffDock(ball: BallState, world: World): void {
   const zone = dockKeepOut(world.width, world.height)
@@ -155,7 +163,7 @@ export function stepBallPhysics(world: World, dt: number): void {
           }
         }
       } else {
-        const friction = Math.exp(-BALL_GROUND_FRICTION * dt)
+        const friction = Math.exp(-groundFrictionAt(world, ball.position) * dt)
         ball.velocity.x *= friction
         ball.velocity.y *= friction
         if (length(ball.velocity) < 5) ball.velocity = { x: 0, y: 0 }

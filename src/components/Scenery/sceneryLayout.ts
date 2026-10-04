@@ -1,4 +1,3 @@
-import { horizontalGapToParkPath, parkPathCenter as pathCenter, parkPathHalfWidth as pathHalfWidth } from '../../game/parkPath'
 import { createSeededRandom, randomBetween } from '../../game/random'
 import type { Vec } from '../../game/types'
 import { WORLD_SEED } from '../../game/constants'
@@ -36,8 +35,6 @@ interface SceneryLayout {
   ridgeTrees: Speck[]
   clouds: CloudLayout[]
   stripes: string[]
-  gravelPath: string
-  gravelSpecks: Speck[]
   tufts: Speck[]
   daisies: Speck[]
   lawnPatches: Speck[]
@@ -121,40 +118,6 @@ export function createSceneryLayout(width: number, height: number, lawnTopRatio:
     stripes.push(`M ${topLeft} ${lawnTop - 20} L ${topRight} ${lawnTop - 20} L ${bottomRight} ${height} L ${bottomLeft} ${height} Z`)
   }
 
-  const sampleCount = 80
-  const leftEdge: Vec[] = []
-  const rightEdge: Vec[] = []
-  for (let index = 0; index <= sampleCount; index += 1) {
-    const progress = index / sampleCount
-    const center = pathCenter(progress, width, height, lawnTop)
-    const ahead = pathCenter(Math.min(1, progress + 0.01), width, height, lawnTop)
-    const behind = pathCenter(Math.max(0, progress - 0.01), width, height, lawnTop)
-    const tangentX = ahead.x - behind.x
-    const tangentY = ahead.y - behind.y
-    const tangentLength = Math.hypot(tangentX, tangentY) || 1
-    const normalX = -tangentY / tangentLength
-    const normalY = tangentX / tangentLength
-    const halfWidth = pathHalfWidth(progress, width)
-    leftEdge.push({ x: center.x + normalX * halfWidth, y: center.y + normalY * halfWidth * 0.5 })
-    rightEdge.push({ x: center.x - normalX * halfWidth, y: center.y - normalY * halfWidth * 0.5 })
-  }
-  const gravelPath = `${smoothPath(leftEdge)} L ${rightEdge[rightEdge.length - 1].x} ${rightEdge[rightEdge.length - 1].y} ${smoothPath([...rightEdge].reverse()).replace(/^M/, 'L')} Z`
-
-  const gravelSpecks: Speck[] = Array.from({ length: Math.round(width * 0.22) }, () => {
-    const progress = Math.pow(random(), 1.4)
-    const center = pathCenter(progress, width, height, lawnTop)
-    const halfWidth = pathHalfWidth(progress, width) * 0.85
-    const depth = depthOf(center.y)
-    return {
-      x: center.x + randomBetween(random, -halfWidth, halfWidth),
-      y: center.y + randomBetween(random, -3, 3),
-      size: (0.6 + random() * 1.1) * (0.6 + depth * 0.7),
-      tone: random() > 0.55 ? '#c9b180' : '#f4e8c9',
-    }
-  })
-
-  const isOnPath = (x: number, y: number) => horizontalGapToParkPath({ x, y }, width, height, lawnTop) < 8
-
   const scatterOnLawn = (count: number, margin: number, build: (x: number, y: number, depth: number) => Speck): Speck[] => {
     const specks: Speck[] = []
     let attempts = 0
@@ -162,7 +125,7 @@ export function createSceneryLayout(width: number, height: number, lawnTopRatio:
       attempts += 1
       const x = random() * width
       const y = lawnTop + margin + Math.pow(random(), 0.85) * (lawnDepth - margin)
-      if (y < crestY(x, width, lawnTop) + margin || isOnPath(x, y)) continue
+      if (y < crestY(x, width, lawnTop) + margin) continue
       specks.push(build(x, y, depthOf(y)))
     }
     return specks.sort((first, second) => first.y - second.y)
@@ -205,8 +168,6 @@ export function createSceneryLayout(width: number, height: number, lawnTopRatio:
     ridgeTrees,
     clouds,
     stripes,
-    gravelPath,
-    gravelSpecks,
     tufts,
     daisies,
     lawnPatches,

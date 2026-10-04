@@ -5,6 +5,7 @@ import { beginBehavior, beginChase } from '../ai/helpers/transitions'
 import type { StepContext } from '../memory'
 import type { CatState } from '../types'
 import type { NeedRecord } from './needTypes'
+import { engagedBehaviorIds } from '../happiness/happinessCatalog'
 
 const waitingBehaviorIds = new Set(['enjoyCareItem', 'celebrate'])
 const zestChaseBoost = 1.2
@@ -15,7 +16,7 @@ export function kickOffZest(cat: CatState, context: StepContext, record: NeedRec
     record.zestPending = false
     return
   }
-  if (waitingBehaviorIds.has(cat.behavior)) return
+  if (waitingBehaviorIds.has(cat.behavior) || engagedBehaviorIds.has(cat.behavior)) return
   const mind = mindOf(cat, context)
   if (cat.hidden || mind.leap || cat.height > 1 || cat.propId) return
   record.zestPending = false

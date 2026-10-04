@@ -9,8 +9,10 @@ import { motionBehaviors } from './motion'
 import { needBehaviors } from './needs'
 import { playBehaviors } from './play'
 import { propBehaviors } from './props'
+import { shopItemBehaviors, shopItemCalmBehaviorIds } from './shopItems'
 import { socialBehaviors } from './social'
 import { toolBehaviors } from './tools'
+import { lazinessFactor, playfulnessFactor } from '../happiness/happiness'
 
 const allBehaviors: Behavior[] = [
   ...coreBehaviors,
@@ -22,6 +24,7 @@ const allBehaviors: Behavior[] = [
   ...motionBehaviors,
   ...careBehaviors,
   ...needBehaviors,
+  ...shopItemBehaviors,
 ]
 
 const calmBehaviorIds = new Set([
@@ -48,6 +51,7 @@ const calmBehaviorIds = new Set([
   'lampLounge',
   'restByProp',
   'postMealGroom',
+  ...shopItemCalmBehaviorIds,
 ])
 const daytimeCalmFactor = 0.32
 const defaultRecencyPenalty = 0.85
@@ -83,6 +87,15 @@ function energyFactor(behavior: Behavior, context: StepContext): number {
   return daytimeCalmFactor
 }
 
+const playfulIntents = new Set(['play', 'chaseBall', 'chaseButterfly', 'teaseCursor', 'socialize', 'tunnelRun'])
+const restfulIntents = new Set(['napping', 'hide'])
+
+function moodFactor(behavior: Behavior, cat: CatState): number {
+  if (playfulIntents.has(behavior.intent)) return playfulnessFactor(cat)
+  if (restfulIntents.has(behavior.intent) || calmBehaviorIds.has(behavior.id)) return lazinessFactor(cat)
+  return 1
+}
+
 function matchesBallState(behavior: Behavior, cat: CatState): boolean {
   return Boolean(behavior.withBall) === Boolean(cat.heldBallId)
 }
@@ -91,7 +104,7 @@ function selectionWeight(behavior: Behavior, cat: CatState, mind: CatMind, conte
   if (!matchesBallState(behavior, cat)) return 0
   const base = behavior.weight(cat, mind, context)
   if (!(base > 0)) return 0
-  return base * recencyFactor(behavior, mind, context.world.time) * crowdFactor(behavior, cat, context) * energyFactor(behavior, context)
+  return base * recencyFactor(behavior, mind, context.world.time) * crowdFactor(behavior, cat, context) * energyFactor(behavior, context) * moodFactor(behavior, cat)
 }
 
 function createBehaviorLibrary(behaviors: Behavior[]): BehaviorLibrary {

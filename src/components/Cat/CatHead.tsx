@@ -9,6 +9,7 @@ import CatEye from './head/CatEye'
 import MouthItem, { type MouthItemSpec } from './head/MouthItem'
 import HeadFace from './head/HeadFace'
 import { headLayout } from './head/headLayout'
+import CatCollar from './head/CatCollar'
 
 interface CatHeadProps {
   center: Vec
@@ -19,6 +20,7 @@ interface CatHeadProps {
   eyeOpen: number
   mouthItem: MouthItemSpec | null
   clipId: string
+  collarColor: string | null
 }
 
 const tongueColor = '#f08c9a'
@@ -29,7 +31,7 @@ function itemTransform(item: MouthItemSpec, nose: Vec): string {
   return `translate(${nose.x - 1} ${nose.y + 4.5})`
 }
 
-export default function CatHead({ center, rig, dimensions, coat, pupilOffset, eyeOpen, mouthItem, clipId }: CatHeadProps) {
+export default function CatHead({ center, rig, dimensions, coat, pupilOffset, eyeOpen, mouthItem, clipId, collarColor }: CatHeadProps) {
   const { radius, isPersian, backEyeCenter, frontEyeCenter, nose } = headLayout(dimensions)
   const palette = coatPalette(coat)
   const lineColor = palette.line
@@ -60,6 +62,7 @@ export default function CatHead({ center, rig, dimensions, coat, pupilOffset, ey
       <CatEar ear={backEar} angle={earAngleBack} furColor={palette.backEar} innerColor={palette.innerEar} notched={coat.earNotch} />
       <CatEar ear={frontEar} angle={earAngleFront} furColor={coat.baseColor} innerColor={palette.innerEar} notched={false} />
       <HeadFace dimensions={dimensions} coat={coat} clipId={clipId} />
+      {collarColor && <CatCollar radius={radius} color={collarColor} fluffy={isPersian} />}
       <CatEye
         center={backEyeCenter}
         radiusX={dimensions.eyeRadiusX}

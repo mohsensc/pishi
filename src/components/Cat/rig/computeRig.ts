@@ -9,6 +9,7 @@ import type { CatRig, RigApplier, RigInput } from './rigModel'
 import { baseRig } from './rigModel'
 import { applyArch, applyBellyUp, applyCling, applyFlop } from './sprawled'
 import { applyDangle } from './dangle'
+import { applyMood } from './mood'
 
 const poseAppliers: Record<CatPose, RigApplier> = {
   sit: applySit,
@@ -77,6 +78,7 @@ export function computeRig(input: RigInput): CatRig {
   const rig = baseRig(input.dimensions)
   poseAppliers[input.pose](rig, input)
   applyAction(rig, input)
+  applyMood(rig, input)
   if (input.carrying) applyCarrying(rig, input)
   if (input.drowsiness > 0.02 && input.pose !== 'sleep') applyDrowsy(rig, input)
   if (input.startled && !calmPoses.has(input.pose)) applyStartled(rig)

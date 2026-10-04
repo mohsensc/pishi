@@ -17,6 +17,8 @@ import {
 } from './needCatalog'
 import { needRecordOf } from './needState'
 import { wakeFully } from './sleepControl'
+import { adjustHappiness } from '../happiness/happiness'
+import { REQUEST_DELIGHT_HAPPINESS, WRONG_GIFT_HAPPINESS } from '../happiness/happinessCatalog'
 
 let hooksInstalled = false
 
@@ -42,6 +44,7 @@ function delight(cat: CatState, context: StepContext): void {
   record.nextNeedAt = world.time + memory.random.range(NEED_QUIET_AFTER_GIFT[0], NEED_QUIET_AFTER_GIFT[1])
   record.zestUntil = world.time + ZEST_SECONDS
   record.zestPending = true
+  adjustHappiness(cat, REQUEST_DELIGHT_HAPPINESS)
   setEmote(cat, 'love')
   spawnEffect(world, 'hearts', cat.position, cat.height + 44 * cat.coat.scale, null, 1)
   spawnEffect(world, 'sparkle', cat.position, cat.height + 30 * cat.coat.scale, null, 1)
@@ -51,8 +54,15 @@ function soothe(cat: CatState, context: StepContext): void {
   const { world } = context
   const record = needRecordOf(context, cat)
   cat.needUrge = Math.max(0, (cat.needUrge ?? 0) - WRONG_GIFT_RELIEF)
+  adjustHappiness(cat, WRONG_GIFT_HAPPINESS)
   if (cat.asleep) record.rousedUntil = Math.max(record.rousedUntil, world.time + WRONG_GIFT_AWAKE_SECONDS)
   if (!cat.need) record.nextNeedAt = Math.max(record.nextNeedAt, world.time + WRONG_GIFT_QUIET_SECONDS)
+}
+
+export function satisfyNeed(cat: CatState, context: StepContext, kind: CareItemKind): boolean {
+  if (!cat.need || !fulfillsNeed(cat.need, kind)) return false
+  delight(cat, context)
+  return true
 }
 
 function answerCarePresentation({ context, cat, kind }: CarePresentation): void {

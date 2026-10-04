@@ -17,6 +17,7 @@ import ScratchingPost from './ScratchingPost'
 import ShadeTree from './ShadeTree'
 import Tunnel from './Tunnel'
 import YarnBasket from './YarnBasket'
+import ShopItemArt from '../ShopItems/ShopItemArt'
 import styles from './Props.module.css'
 import type { PropViewProps } from './propView'
 
@@ -102,6 +103,8 @@ function renderPropKind(view: PropViewProps): ReactElement {
       return <FeedingStation {...view} />
     case 'cushion':
       return <Cushion {...view} />
+    default:
+      return <ShopItemArt {...view} />
   }
 }
 

@@ -9,6 +9,8 @@ import { dropBallFor } from './support/contest'
 import { laserDot, laserSpeed } from './support/laser'
 import { chain, gazeAt } from './support/phases'
 import { checkChance, countDoing, isFreeForTools, laserIds } from './support/toolQueries'
+import { wantsTool } from '../../needs/toolNeeds'
+import { requestEagerness } from '../../happiness/happiness'
 
 export const chaseLaserBehavior: Behavior = {
   id: 'chaseLaser',
@@ -22,6 +24,7 @@ export const chaseLaserBehavior: Behavior = {
   urgency(cat, mind, context) {
     const dot = laserDot(context)
     if (!dot || laserIds.has(cat.behavior) || !isFreeForTools(cat, mind, context, true)) return 0
+    if (wantsTool(cat, 'laser') && !cat.asleep && distance(cat.position, dot) < 900 * context.memory.sizeScale) return checkChance(context, 3.6 * requestEagerness(cat)) ? 5.2 : 0
     if (distance(cat.position, dot) > 560 * context.memory.sizeScale || mind.personality.zoominess < 0.3) return 0
     if (countDoing(context, laserIds, cat.id) >= MAX_LASER_CHASERS) return 0
     return checkChance(context, (cat.heldBallId ? 0.4 : 1) * (0.6 + mind.personality.zoominess * 1.6)) ? 3.4 : 0

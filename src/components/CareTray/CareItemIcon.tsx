@@ -1,8 +1,8 @@
 import type { JSX } from 'react'
-import type { CareItemKind } from '../../game/types'
+import type { TrayItemKind } from '../../game/types'
 
 interface CareItemIconProps {
-  kind: CareItemKind
+  kind: TrayItemKind
   size?: number
 }
 
@@ -67,12 +67,27 @@ function TreatArt() {
   )
 }
 
-const careArt: Record<CareItemKind, () => JSX.Element> = {
+function CollarArt() {
+  return (
+    <g strokeLinejoin="round" strokeLinecap="round">
+      <ellipse cx={16} cy={12.6} rx={11} ry={6} fill="none" stroke="#a8322a" strokeWidth={5.2} />
+      <ellipse cx={16} cy={12.6} rx={11} ry={6} fill="none" stroke="#d9503f" strokeWidth={3.2} />
+      <path d="M8.4 15.6c4.6 2.2 10.6 2.2 15.2 0" fill="none" stroke="#f08a78" strokeWidth={1} opacity={0.7} />
+      <rect x={21} y={15} width={4.4} height={3.6} rx={0.9} fill="#f1d27a" stroke="#b28a2c" strokeWidth={0.9} />
+      <path d="M16 18.4v2.4" stroke="#b28a2c" strokeWidth={1.2} />
+      <circle cx={16} cy={24.2} r={3.6} fill="#f2c94c" stroke="#b28a2c" strokeWidth={1.2} />
+      <path d="M14.5 24h3" stroke="#b28a2c" strokeWidth={0.9} />
+    </g>
+  )
+}
+
+const careArt: Record<TrayItemKind, () => JSX.Element> = {
   fish: FishArt,
   milk: MilkArt,
   yarn: YarnArt,
   brush: BrushArt,
   treat: TreatArt,
+  collar: CollarArt,
 }
 
 export default function CareItemIcon({ kind, size = 28 }: CareItemIconProps) {

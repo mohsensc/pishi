@@ -107,9 +107,12 @@
     padding: 4px;
     border-radius: 16px;
     transform: none;
+    max-width: calc(100% - 20px);
   }
 
   .toolButton {
+    flex: 0 1 auto;
+    min-width: 0;
     width: 40px;
     height: 40px;
     border-radius: 12px;
@@ -162,8 +165,134 @@
   }
 
   .trash {
+    flex: 0 1 auto;
+    min-width: 0;
     width: 40px;
     height: 40px;
     border-radius: 12px;
+  }
+}
+
+.glyph {
+  display: grid;
+  place-items: center;
+  transition: opacity 0.2s ease, filter 0.2s ease;
+}
+
+.toolButton[data-locked='true'] .glyph {
+  opacity: 0.3;
+  filter: grayscale(1);
+}
+
+.toolButton[data-locked='true'][data-affordable='true'] .glyph {
+  opacity: 0.62;
+  filter: grayscale(0.4);
+}
+
+.toolButton[data-armed='true'] {
+  background: rgba(141, 179, 42, 0.18);
+}
+
+.toolButton[data-armed='true'] .glyph {
+  opacity: 1;
+  filter: none;
+}
+
+.toolPrice {
+  position: absolute;
+  left: 50%;
+  bottom: -5px;
+  z-index: 1;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.unlockRing {
+  position: absolute;
+  inset: 3px;
+  border-radius: 12px;
+  border: 2px solid #8db32a;
+  pointer-events: none;
+}
+
+.toolButton[data-denied='true'] {
+  animation: toolDeny 0.36s ease;
+}
+
+.toolButton[data-fresh='true'] {
+  background: rgba(141, 179, 42, 0.2);
+}
+
+@keyframes toolDeny {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  25% {
+    translate: -3px 0;
+  }
+  75% {
+    translate: 3px 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toolButton[data-denied='true'] {
+    animation: none;
+  }
+}
+
+.trash {
+  position: relative;
+}
+
+.trash[data-refused='true'] {
+  border-color: rgba(32, 48, 31, 0.24);
+  color: rgba(32, 48, 31, 0.5);
+}
+
+.trash[data-refused='true'][data-over='true'] {
+  border-color: rgba(32, 48, 31, 0.4);
+  border-style: dashed;
+  background: rgba(32, 48, 31, 0.06);
+  color: #2d3a2a;
+}
+
+.refundAnchor {
+  position: absolute;
+  left: calc(100% + 8px);
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.refundChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  height: 20px;
+  padding: 0 7px 0 4px;
+  border-radius: 999px;
+  background: #ffffff;
+  border: 1px solid rgba(32, 48, 31, 0.1);
+  color: #4f6b12;
+  font-size: 11px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.refundChip[data-empty='true'] {
+  color: rgba(32, 48, 31, 0.42);
+}
+
+@media (max-width: 640px) {
+  .refundAnchor {
+    left: auto;
+    right: 0;
+    top: auto;
+    bottom: calc(100% + 8px);
+    transform: none;
   }
 }

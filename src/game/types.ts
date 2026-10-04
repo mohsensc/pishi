@@ -2,9 +2,17 @@ import type { BallKind, DragState, TreatBagShake } from './handlingTypes'
 
 import type { CatnipPatch, HeldToyState, ToolKind, TreatState } from './toolTypes'
 import type { CareItemKind, CareState } from './care/careTypes'
+import type { ProgressState } from './progress/progressTypes'
+import type { EconomyState } from './economy/economyTypes'
+import type { LandscapeState } from './landscape/landscapeTypes'
+import type { ShopPropKind } from './shopItems/shopPropKinds'
 
 export type { CatnipPatch, HeldToyState, ToolKind, TreatState } from './toolTypes'
-export type { CareItem, CareItemKind, CareReward, CareState } from './care/careTypes'
+export type { CareItem, CareItemKind, CareReward, CareState, TrayItemKind } from './care/careTypes'
+export type { ProgressState, UnlockableItemKind } from './progress/progressTypes'
+export type { DeniedEvent, EconomyState, NextGoal, ShopItemId, ShopOffer, TierStanding, TokenEvent } from './economy/economyTypes'
+export type { LandscapeState, PathStyle } from './landscape/landscapeTypes'
+export type { ShopPropKind } from './shopItems/shopPropKinds'
 export type { BallKind, DragHit, DragState, DragTarget, SpawnableItem, SpawnablePropKind, TreatBagShake } from './handlingTypes'
 
 export interface Vec {
@@ -133,6 +141,13 @@ export interface CatState {
   need?: CareItemKind | null
   needUrge?: number
   asleep?: boolean
+  happiness?: number
+  collar?: CatCollar | null
+}
+
+export interface CatCollar {
+  color: string
+  fittedAt: number
 }
 
 export type BallStatus = 'loose' | 'held' | 'stashed' | 'popped'
@@ -169,6 +184,7 @@ export type PropKind =
   | 'lamppost'
   | 'feedingStation'
   | 'cushion'
+  | ShopPropKind
 
 export interface PropState {
   id: string
@@ -192,7 +208,7 @@ export interface PropState {
   spawnedAt: number | null
 }
 
-export type EffectKind = 'leaves' | 'splash' | 'kibble' | 'petals' | 'dust' | 'sparkle' | 'yarn' | 'bounce' | 'hearts' | 'crumbs' | 'catnipPuff' | 'furTuft'
+export type EffectKind = 'leaves' | 'splash' | 'kibble' | 'petals' | 'dust' | 'sparkle' | 'yarn' | 'bounce' | 'hearts' | 'crumbs' | 'catnipPuff' | 'furTuft' | 'poof' | 'birds' | 'bubbles'
 
 export interface WorldEffect {
   id: string
@@ -245,6 +261,9 @@ export interface World {
   pops: PopEvent[]
   poppedCount: number
   care: CareState
+  progress: ProgressState
+  economy: EconomyState
+  landscape: LandscapeState
 }
 
 export interface WorldConfig {
@@ -252,4 +271,5 @@ export interface WorldConfig {
   height: number
   catCount: number
   ballCount: number
+  seed?: number
 }

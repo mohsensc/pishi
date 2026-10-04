@@ -1,0 +1,35 @@
+.anchor {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 241000;
+  pointer-events: none;
+}
+
+.tag {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 8px 4px 6px;
+  border-radius: 999px;
+  border: 1.5px solid #20301f;
+  background: rgba(255, 255, 255, 0.94);
+  color: #20301f;
+  translate: -50% -100%;
+  transform-origin: 50% 100%;
+  white-space: nowrap;
+}
+
+.dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #20301f;
+}
+
+.name {
+  font-size: 13px;
+  font-weight: 650;
+  line-height: 1;
+  letter-spacing: 0.01em;
+}

@@ -1,0 +1,447 @@
+.ground {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.anchor {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.canvas {
+  position: absolute;
+  left: 0;
+  top: 0;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.toolLayer {
+  position: absolute;
+  inset: 0;
+  z-index: 240000;
+  touch-action: none;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.lean {
+  transform-origin: 0 0;
+  transition: transform 0.28s cubic-bezier(0.3, 1.5, 0.5, 1);
+}
+
+.lean[data-hovered='true'] {
+  transform: rotate(2deg);
+}
+
+.canopyFade {
+  transition: opacity 0.8s ease 0.35s;
+}
+
+.canopyFade[data-faded='true'] {
+  opacity: 0.55;
+  transition: opacity 0.3s ease;
+}
+
+.saplingGrow {
+  transform-origin: 0 0;
+  animation: saplingGrow 60s linear both;
+}
+
+.saplingSway {
+  transform-origin: 0 0;
+  animation: saplingSway 2.4s ease-in-out 25 alternate;
+}
+
+.fellFade {
+  animation: fellFade 2.5s ease-in both;
+}
+
+.fellRight {
+  animation: fellRight 1.72s linear both;
+}
+
+.fellLeft {
+  animation: fellLeft 1.72s linear both;
+}
+
+.tile {
+  transform-box: view-box;
+  transform-origin: 0 0;
+}
+
+.tileStamp {
+  animation: tileStamp 0.46s cubic-bezier(0.25, 1.55, 0.45, 1) both;
+}
+
+.tileDrop {
+  animation: tileDrop 0.52s cubic-bezier(0.3, 1.2, 0.4, 1) both;
+}
+
+.tileSink {
+  animation: tileSink 0.42s ease-in both;
+}
+
+.speck {
+  transform-box: view-box;
+  transform-origin: 0 0;
+  animation: speckBurst 0.55s cubic-bezier(0.2, 0.7, 0.4, 1) both;
+}
+
+.cellCursor {
+  transition: transform 0.08s ease-out;
+}
+
+.cellCursor[data-denied='true'] rect {
+  stroke: #e0574a;
+  animation: cursorDeny 0.32s ease;
+}
+
+.rim {
+  transform-origin: 0 0;
+  animation: rimIn 0.22s ease-out both;
+}
+
+.missRing {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: missRing 0.45s ease-out both;
+}
+
+.badge {
+  position: absolute;
+  right: 1px;
+  bottom: 1px;
+  display: grid;
+  place-items: center;
+  min-width: 15px;
+  height: 15px;
+  padding: 0 3px;
+  border-radius: 8px;
+  background: #ffffff;
+  border: 1px solid rgba(32, 48, 31, 0.1);
+  color: #2d3a2a;
+  font-size: 9px;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  pointer-events: none;
+}
+
+.badge[data-empty='true'] {
+  padding: 0;
+  min-width: 15px;
+}
+
+.badge[data-denied='true'] {
+  animation: badgeDeny 0.5s ease both;
+}
+
+.buildSlot {
+  position: relative;
+  display: grid;
+}
+
+@media (max-width: 640px) {
+  .buildSlot {
+    flex: 0 1 auto;
+    min-width: 0;
+    width: 40px;
+  }
+
+  .buildSlot > button {
+    width: 100%;
+  }
+}
+
+.shaker {
+  display: grid;
+  place-items: center;
+}
+
+.swatches {
+  position: absolute;
+  left: calc(100% + 12px);
+  top: 50%;
+  translate: 0 -50%;
+  transform-origin: left center;
+  z-index: 2;
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(32, 48, 31, 0.08);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.swatch {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  transition: background-color 0.14s ease, transform 0.14s ease;
+}
+
+.swatch:hover {
+  background: rgba(32, 48, 31, 0.07);
+}
+
+.swatch:active {
+  transform: scale(0.92);
+}
+
+.swatch[data-active='true'] {
+  background: rgba(32, 48, 31, 0.1);
+  box-shadow: inset 0 0 0 1.5px #1f2a1c;
+}
+
+.swatch[data-locked='true'] .shaker {
+  opacity: 0.35;
+  filter: grayscale(1);
+}
+
+@media (max-width: 640px) {
+  .swatches {
+    left: auto;
+    right: -6px;
+    top: auto;
+    bottom: calc(100% + 12px);
+    translate: 0 0;
+    transform-origin: right bottom;
+  }
+}
+
+@keyframes fellFade {
+  0%,
+  66% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes fellRight {
+  0% {
+    transform: rotate(0deg);
+    animation-timing-function: ease-out;
+  }
+  5% {
+    transform: rotate(4deg);
+    animation-timing-function: ease-in-out;
+  }
+  13% {
+    transform: rotate(-1.5deg);
+    animation-timing-function: ease-out;
+  }
+  20% {
+    transform: rotate(5deg);
+    animation-timing-function: ease-in-out;
+  }
+  30% {
+    transform: rotate(1deg);
+    animation-timing-function: cubic-bezier(0.55, 0, 0.9, 0.6);
+  }
+  80% {
+    transform: rotate(86deg);
+    animation-timing-function: ease-out;
+  }
+  89% {
+    transform: rotate(80deg);
+    animation-timing-function: ease-in;
+  }
+  100% {
+    transform: rotate(84deg);
+  }
+}
+
+@keyframes fellLeft {
+  0% {
+    transform: rotate(0deg);
+    animation-timing-function: ease-out;
+  }
+  5% {
+    transform: rotate(-4deg);
+    animation-timing-function: ease-in-out;
+  }
+  13% {
+    transform: rotate(1.5deg);
+    animation-timing-function: ease-out;
+  }
+  20% {
+    transform: rotate(-5deg);
+    animation-timing-function: ease-in-out;
+  }
+  30% {
+    transform: rotate(-1deg);
+    animation-timing-function: cubic-bezier(0.55, 0, 0.9, 0.6);
+  }
+  80% {
+    transform: rotate(-86deg);
+    animation-timing-function: ease-out;
+  }
+  89% {
+    transform: rotate(-80deg);
+    animation-timing-function: ease-in;
+  }
+  100% {
+    transform: rotate(-84deg);
+  }
+}
+
+@keyframes badgeDeny {
+  0%,
+  55% {
+    background: #e0574a;
+    border-color: #e0574a;
+    color: #ffffff;
+  }
+  100% {
+    background: #ffffff;
+    border-color: rgba(32, 48, 31, 0.1);
+    color: #2d3a2a;
+  }
+}
+
+@keyframes saplingGrow {
+  from {
+    transform: scale(0.3);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+@keyframes saplingSway {
+  from {
+    transform: rotate(-2.2deg);
+  }
+  to {
+    transform: rotate(2.2deg);
+  }
+}
+
+@keyframes tileStamp {
+  0% {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  45% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes tileDrop {
+  0% {
+    opacity: 0;
+    transform: translateY(-14px) scale(0.92);
+  }
+  55% {
+    opacity: 1;
+    transform: translateY(1.5px) scale(1.04, 0.94);
+  }
+  78% {
+    transform: translateY(-1.5px) scale(0.99, 1.01);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes tileSink {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(5px) scale(0.35, 0.25);
+  }
+}
+
+@keyframes speckBurst {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.6);
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--speck-x), var(--speck-y)) scale(1);
+  }
+}
+
+@keyframes rimIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 0.9;
+  }
+}
+
+@keyframes missRing {
+  from {
+    opacity: 0.9;
+    transform: scale(0.4);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.4);
+  }
+}
+
+@keyframes cursorDeny {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  25% {
+    translate: -4px 0;
+  }
+  50% {
+    translate: 4px 0;
+  }
+  75% {
+    translate: -4px 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .saplingSway,
+  .tileStamp,
+  .tileDrop,
+  .speck {
+    animation: none;
+  }
+
+  .tileSink {
+    animation-duration: 0.01s;
+  }
+}

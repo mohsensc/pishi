@@ -1,6 +1,6 @@
 import type { StepContext } from '../memory'
 import type { World } from '../types'
-import { careBaseWeights, careItemKinds, CARE_METER_GOAL, CARE_TRAY_CAPACITY, catchPoints } from './careCatalog'
+import { careBaseWeights, careItemKinds, CARE_METER_GOAL, CARE_TRAY_CAPACITY } from './careCatalog'
 import type { CareDemandProvider, CareItem, CareItemKind, CareReward, CareState, CatchKind } from './careTypes'
 
 const fullMeter = 1 - 1e-6
@@ -72,10 +72,10 @@ export function settleCareMeter(context: StepContext): CareItemKind | null {
   return item.kind
 }
 
-export function grantCatchReward(context: StepContext, catchKind: CatchKind): CareReward {
+export function grantCatchReward(context: StepContext, catchKind: CatchKind, tokens: number): CareReward {
   const { world } = context
-  const points = catchPoints[catchKind]
-  world.care.meter = Math.min(isTrayFull(world) ? 1 : 2, world.care.meter + points / CARE_METER_GOAL)
+  const points = Math.max(0, Math.floor(tokens))
+  world.care.meter = Math.min(isTrayFull(world) ? 1 : 2, world.care.meter + 1 / CARE_METER_GOAL)
   const unlockedKind = settleCareMeter(context)
   if (isTrayFull(world)) world.care.meter = Math.min(1, world.care.meter)
   world.care.serial += 1
@@ -89,4 +89,11 @@ export function takeCareItem(world: World, kind: CareItemKind): CareItem | null 
   if (!item) return null
   world.care.inventory = world.care.inventory.filter((candidate) => candidate !== item)
   return item
+}
+
+export function discardCareItem(world: World, itemId: string): boolean {
+  const remaining = world.care.inventory.filter((item) => item.id !== itemId)
+  if (remaining.length === world.care.inventory.length) return false
+  world.care.inventory = remaining
+  return true
 }

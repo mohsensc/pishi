@@ -1,4 +1,4 @@
-import type { CareItemKind, CareNeed, CatchKind } from './careTypes'
+import type { CareItemKind, CareNeed } from './careTypes'
 
 export const careItemKinds: readonly CareItemKind[] = ['fish', 'milk', 'yarn', 'brush', 'treat']
 
@@ -18,12 +18,8 @@ export const careBaseWeights: Record<CareItemKind, number> = {
   treat: 0.45,
 }
 
-export const catchPoints: Record<CatchKind, number> = {
-  loose: 1,
-  stolen: 2,
-}
-
-export const CARE_METER_GOAL = 3
+export const CARE_METER_GOAL = 6
 export const CARE_TRAY_CAPACITY = 5
 export const STEAL_WINDOW_SECONDS = 3
-export const CARE_REACH = 46
+export const CARE_REACH = 58
+export const WANTED_CARE_REACH = 96

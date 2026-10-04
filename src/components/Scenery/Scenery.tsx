@@ -117,10 +117,6 @@ function Scenery({ width, height, skyTime }: SceneryProps) {
           <rect key={post.x} x={post.x - 1.4} y={post.y - 13} width={2.8} height={13} rx={1} fill="#b89366" />
         ))}
       </g>
-      <path d={layout.gravelPath} fill="#e9d8ae" stroke="#d6c093" strokeWidth={2.5} strokeLinejoin="round" />
-      {layout.gravelSpecks.map((speck) => (
-        <circle key={`${speck.x}${speck.y}`} cx={speck.x} cy={speck.y} r={speck.size} fill={speck.tone} />
-      ))}
       {layout.tufts.map((tuft) => (
         <GrassTuft key={`${tuft.x}${tuft.y}`} {...tuft} />
       ))}

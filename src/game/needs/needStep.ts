@@ -21,6 +21,9 @@ import { ensureNeedHooks } from './needCare'
 import { needRecordOf } from './needState'
 import type { NeedRecord } from './needTypes'
 import { kickOffZest } from './zestKickoff'
+import { needPatienceFactor } from '../happiness/happiness'
+import { stepToolNeeds } from './toolNeeds'
+import { rouseForOffer } from './offerRousing'
 import { needSleepId } from './needIds'
 import { canSettleToSleep, fallAsleep, rouseCat, settleToSleep, wakeNaturally } from './sleepControl'
 
@@ -67,7 +70,7 @@ function progressNeed(cat: CatState, context: StepContext, record: NeedRecord, t
     return
   }
   if (cat.asleep) return
-  cat.needUrge = Math.min(1, (cat.needUrge ?? 0) + dt / record.patience)
+  cat.needUrge = Math.min(1, (cat.needUrge ?? 0) + (dt / record.patience) * needPatienceFactor(cat))
   if (cat.needUrge < 1 || tally.awake <= MIN_AWAKE_CATS || !canSettleToSleep(cat, context)) return
   fallAsleep(cat, context)
   tally.awake -= 1
@@ -114,4 +117,6 @@ export function stepNeeds(context: StepContext): void {
     }
     cat.drowsiness = drowsinessOf(cat, record, world.time)
   })
+  stepToolNeeds(context)
+  rouseForOffer(context)
 }

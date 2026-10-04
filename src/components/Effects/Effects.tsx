@@ -10,6 +10,9 @@ import FurTuft from './FurTuft'
 import Hearts from './Hearts'
 import Kibble from './Kibble'
 import Petals from './Petals'
+import Poof from './Poof'
+import BirdScatter from './BirdScatter'
+import Bubbles from './Bubbles'
 import RollingYarn from './RollingYarn'
 import Sparkle from './Sparkle'
 import Splash from './Splash'
@@ -39,6 +42,9 @@ const effectViews: Record<EffectKind, ComponentType<EffectViewProps>> = {
   crumbs: Crumbs,
   catnipPuff: CatnipPuff,
   furTuft: FurTuft,
+  poof: Poof,
+  birds: BirdScatter,
+  bubbles: Bubbles,
 }
 
 const zIndexLift: Record<EffectKind, number> = {
@@ -54,6 +60,9 @@ const zIndexLift: Record<EffectKind, number> = {
   crumbs: 60,
   catnipPuff: 50,
   furTuft: 90,
+  poof: 140,
+  birds: 470,
+  bubbles: 120,
 }
 
 const EffectItem = memo(

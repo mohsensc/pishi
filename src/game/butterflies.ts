@@ -11,6 +11,7 @@ const maximumHeight = 120
 const maximumButterflies = 9
 const lampAttraction = 260
 const lampHoverHeight = 110
+const houseAttraction = 220
 
 interface ButterflyMotion {
   escapeTimer: number
@@ -87,6 +88,30 @@ function steerToward(butterfly: ButterflyState, target: Vec, strength: number, d
   butterfly.heading += difference * Math.min(1, strength * dt)
 }
 
+export function releaseButterfly(world: World, from: Vec, random: Random, lifetime: number, cap: number): string | null {
+  if (world.butterflies.length >= cap) return null
+  const serial = (butterflySerials.get(world) ?? 0) + 1
+  butterflySerials.set(world, serial)
+  const butterfly: ButterflyState = {
+    id: `butterfly-house-${serial}`,
+    position: { x: from.x + random.range(-6, 6), y: from.y + random.range(-2, 4) },
+    height: random.range(50, 70),
+    heading: random.range(-Math.PI * 0.9, -Math.PI * 0.1),
+    hue: random.pick([42, 28, 198, 12, 52, 185, 330, 280]),
+    clock: random.range(0, 10),
+  }
+  world.butterflies.push(butterfly)
+  const motion = motionOf(butterfly)
+  motion.expiresAt = world.time + lifetime + random.range(-6, 6)
+  motion.escapeTimer = 0.8
+  motion.targetHeight = 90
+  return butterfly.id
+}
+
+function homeHouseNear(world: World, butterfly: ButterflyState): PropState | undefined {
+  return world.props.find((prop) => (prop.kind === 'butterflyHouse' || prop.kind === 'flowerBed') && distance(prop.position, butterfly.position) < houseAttraction)
+}
+
 function litLampNear(world: World, butterfly: ButterflyState): PropState | undefined {
   return world.props.find((prop) => prop.kind === 'lamppost' && prop.lit && distance(prop.position, butterfly.position) < lampAttraction)
 }
@@ -119,6 +144,8 @@ export function stepButterflies(world: World, dt: number, random: Random, pointe
       steerToward(butterfly, lamp.position, distance(lamp.position, butterfly.position) > 40 ? 3 : 0.6, dt)
       motion.targetHeight = lampHoverHeight
     }
+    const house = !lamp && index % 3 === 1 && motion.escapeTimer <= 0 ? homeHouseNear(world, butterfly) : undefined
+    if (house && distance(house.position, butterfly.position) > 50) steerToward(butterfly, house.position, 0.9, dt)
     if (pointer && distance(pointer, butterfly.position) < 60 && motion.escapeTimer <= 0) scareButterfly(butterfly, pointer)
     const speed = motion.escapeTimer > 0 ? escapeSpeed : butterflySpeed * (0.7 + 0.5 * Math.abs(Math.sin(butterfly.clock * 1.3)))
     butterfly.position.x = clamp(butterfly.position.x + Math.cos(butterfly.heading) * speed * dt, bounds.left, bounds.right)

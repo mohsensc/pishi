@@ -45,7 +45,7 @@ export default function CatchMeter({ progress, full, reward }: CatchMeterProps) 
             initial={{ opacity: 0, scale: 0.4, y: 4 }}
             animate={{ opacity: [0, 1, 1, 0], scale: 1, y: -10 }}
             transition={{ duration: 1.1, times: [0, 0.15, 0.7, 1] }}>
-            ×2
+            +{reward.points}
           </motion.span>
         )}
       </AnimatePresence>
