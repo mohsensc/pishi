@@ -1,0 +1,116 @@
+.anchor {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 0;
+  z-index: 210000;
+  pointer-events: none;
+  will-change: transform;
+}
+
+.lift {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transition: transform 0.45s cubic-bezier(0.3, 0.7, 0.3, 1);
+}
+
+.bubble {
+  position: absolute;
+  transform-origin: 50% 100%;
+}
+
+.pulse {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-origin: 50% 80%;
+}
+
+.anchor[data-asleep='true'] .pulse {
+  opacity: 0.72;
+  filter: saturate(0.65);
+}
+
+.shape {
+  position: absolute;
+  inset: 0;
+  overflow: visible;
+}
+
+.body,
+.trail {
+  fill: #fffdf7;
+  stroke: rgba(32, 48, 31, 0.14);
+  stroke-width: 1;
+}
+
+.patience {
+  fill: none;
+  stroke: #e9a92a;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  transition: stroke-dasharray 0.3s linear;
+}
+
+.icon {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: grid;
+  place-items: center;
+}
+
+.icon svg {
+  display: block;
+}
+
+.zs {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 0;
+  z-index: 209000;
+  pointer-events: none;
+}
+
+.z {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  overflow: visible;
+  opacity: 0;
+  fill: none;
+  stroke: #5a6bab;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  animation: drift 2.7s ease-out infinite;
+}
+
+.zHalo {
+  stroke: rgba(255, 253, 247, 0.85);
+  stroke-width: 4;
+}
+
+@keyframes drift {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.6);
+  }
+  20% {
+    opacity: 0.95;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(calc(var(--drift, 1) * 14px), -30px) scale(1.15);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .z {
+    animation-duration: 6s;
+  }
+}

@@ -1,0 +1,24 @@
+.anchor {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 245000;
+  pointer-events: none;
+}
+
+.bag {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform-origin: 19.5px 44px;
+}
+
+.kibble {
+  position: absolute;
+  left: -2.5px;
+  top: -2.5px;
+  width: 5px;
+  height: 4px;
+  border-radius: 45%;
+  background: #b9773a;
+}

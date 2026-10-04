@@ -1,0 +1,118 @@
+.anchor {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 0;
+  transform-origin: 0 0;
+  pointer-events: none;
+}
+
+.propRoot {
+  display: contents;
+}
+
+.canvas {
+  position: absolute;
+  left: 0;
+  top: 0;
+  overflow: visible;
+  pointer-events: visiblePainted;
+  transform-origin: 0 0;
+  transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+.propRoot:hover .canvas:not(.passive) {
+  transform: scale(1.025);
+  filter: brightness(1.07);
+}
+
+.passive {
+  pointer-events: none;
+}
+
+.wiggle {
+  animation: wiggle 0.9s ease-in-out infinite;
+  transform-origin: 0 0;
+}
+
+.rustle {
+  animation: rustle 0.35s ease-in-out infinite;
+}
+
+.sway {
+  animation: sway 7s ease-in-out infinite alternate;
+}
+
+.swing {
+  animation: swing 2.6s ease-in-out infinite alternate;
+}
+
+.ripple {
+  animation: ripple 3.6s ease-out infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.glow {
+  animation: glow 4s ease-in-out infinite alternate;
+}
+
+.bob {
+  animation: bob 3.2s ease-in-out infinite alternate;
+}
+
+.peek {
+  animation: peek 1.8s ease-in-out infinite;
+}
+
+@keyframes wiggle {
+  0%, 100% { transform: rotate(0deg); }
+  20% { transform: rotate(-2.2deg); }
+  45% { transform: rotate(1.8deg); }
+  70% { transform: rotate(-1deg); }
+}
+
+@keyframes rustle {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-1.5px); }
+}
+
+@keyframes sway {
+  from { transform: rotate(-0.8deg); }
+  to { transform: rotate(0.8deg); }
+}
+
+@keyframes swing {
+  from { transform: rotate(-14deg); }
+  to { transform: rotate(14deg); }
+}
+
+@keyframes ripple {
+  0% { transform: scale(0.3); opacity: 0; }
+  20% { opacity: 0.7; }
+  100% { transform: scale(1.4); opacity: 0; }
+}
+
+@keyframes glow {
+  from { opacity: 0.55; }
+  to { opacity: 0.85; }
+}
+
+@keyframes bob {
+  from { transform: translateY(0); }
+  to { transform: translateY(1.5px); }
+}
+
+@keyframes peek {
+  0%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-3px); }
+  60% { transform: translateY(-3px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wiggle, .rustle, .sway, .swing, .ripple, .glow, .bob, .peek {
+    animation: none;
+  }
+}
+

@@ -1,0 +1,315 @@
+.canopyShake {
+  animation: canopyShake 0.95s cubic-bezier(0.3, 0.6, 0.4, 1) both;
+}
+
+.trunkShake {
+  animation: trunkShake 0.8s ease-out both;
+}
+
+.canopyRustle {
+  animation: canopyRustle 1.6s ease-in-out infinite;
+}
+
+.wobble {
+  animation: wobble 1s ease-out both;
+}
+
+.swingHard {
+  animation: swingHard 1.6s ease-out both;
+}
+
+.boxJump {
+  animation: boxJump 0.7s cubic-bezier(0.3, 0.7, 0.4, 1) both;
+}
+
+.flapLeft {
+  animation: flapLeft 0.7s ease-out both;
+}
+
+.flapRight {
+  animation: flapRight 0.7s ease-out both;
+}
+
+.crinkle {
+  animation: crinkle 0.8s ease-out both;
+}
+
+.roll {
+  animation: roll 0.8s ease-out both;
+}
+
+.tunnelBulge {
+  animation: tunnelBulge 2.4s ease-in-out infinite alternate;
+}
+
+.bushRustle {
+  animation: bushRustle 0.75s ease-out both;
+}
+
+.lurk {
+  animation: lurk 2.2s ease-in-out infinite;
+}
+
+.benchBounce {
+  animation: benchBounce 0.65s ease-out both;
+}
+
+.pokeRipple {
+  animation: pokeRipple 1.2s ease-out both;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.bobHard {
+  animation: bobHard 1.1s ease-out both;
+}
+
+.lampFlicker {
+  animation: lampFlicker 0.45s steps(1, end) both;
+}
+
+.lampWobble {
+  animation: lampWobble 0.7s ease-out both;
+}
+
+.lightPool {
+  animation: lightPool 5s ease-in-out infinite alternate;
+}
+
+.jostle {
+  animation: jostle 0.7s ease-out both;
+}
+
+.rattle {
+  animation: rattle 0.55s linear both;
+}
+
+.flowerSway {
+  animation: flowerSway 1s ease-out both;
+}
+
+.rockBounce {
+  animation: rockBounce 0.6s cubic-bezier(0.3, 0.7, 0.4, 1) both;
+}
+
+.blanketRipple {
+  animation: blanketRipple 0.9s ease-out both;
+}
+
+.waterRipple {
+  animation: waterRipple 3.2s ease-out infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.kibblePour {
+  animation: kibblePour 0.6s ease-out both;
+}
+
+@keyframes canopyShake {
+  0% { transform: rotate(0deg) translateX(0); }
+  10% { transform: rotate(-7deg) translateX(-6px); }
+  24% { transform: rotate(6deg) translateX(5px); }
+  38% { transform: rotate(-4.5deg) translateX(-4px); }
+  52% { transform: rotate(3deg) translateX(3px); }
+  68% { transform: rotate(-1.6deg) translateX(-1px); }
+  84% { transform: rotate(0.8deg); }
+  100% { transform: rotate(0deg) translateX(0); }
+}
+
+@keyframes trunkShake {
+  0%, 100% { transform: rotate(0deg); }
+  15% { transform: rotate(-1.4deg); }
+  35% { transform: rotate(1.1deg); }
+  55% { transform: rotate(-0.6deg); }
+  75% { transform: rotate(0.3deg); }
+}
+
+@keyframes canopyRustle {
+  0%, 100% { transform: translate(0, 0); }
+  20% { transform: translate(1px, -0.5px); }
+  40% { transform: translate(-1px, 0.5px); }
+  60% { transform: translate(0.5px, 0); }
+}
+
+@keyframes wobble {
+  0%, 100% { transform: rotate(0deg); }
+  14% { transform: rotate(-4deg); }
+  32% { transform: rotate(3deg); }
+  50% { transform: rotate(-1.8deg); }
+  70% { transform: rotate(0.9deg); }
+  86% { transform: rotate(-0.3deg); }
+}
+
+@keyframes swingHard {
+  0%, 100% { transform: rotate(0deg); }
+  12% { transform: rotate(38deg); }
+  30% { transform: rotate(-30deg); }
+  48% { transform: rotate(20deg); }
+  66% { transform: rotate(-11deg); }
+  84% { transform: rotate(5deg); }
+}
+
+@keyframes boxJump {
+  0% { transform: translateY(0) scale(1, 1); }
+  12% { transform: translateY(0) scale(1.08, 0.88); }
+  34% { transform: translateY(-16px) scale(0.95, 1.07); }
+  58% { transform: translateY(0) scale(1.07, 0.92); }
+  74% { transform: translateY(-4px) scale(0.99, 1.02); }
+  100% { transform: translateY(0) scale(1, 1); }
+}
+
+@keyframes flapLeft {
+  0%, 100% { transform: rotate(0deg); }
+  30% { transform: rotate(28deg); }
+  55% { transform: rotate(-12deg); }
+  78% { transform: rotate(6deg); }
+}
+
+@keyframes flapRight {
+  0%, 100% { transform: rotate(0deg); }
+  30% { transform: rotate(-28deg); }
+  55% { transform: rotate(12deg); }
+  78% { transform: rotate(-6deg); }
+}
+
+@keyframes crinkle {
+  0%, 100% { transform: scale(1, 1); }
+  15% { transform: scale(0.9, 1.1); }
+  35% { transform: scale(1.06, 0.94); }
+  55% { transform: scale(0.97, 1.03); }
+  75% { transform: scale(1.01, 0.99); }
+}
+
+@keyframes roll {
+  0%, 100% { transform: translateY(0) skewX(0deg); }
+  20% { transform: translateY(-3px) skewX(-5deg); }
+  45% { transform: translateY(1px) skewX(4deg); }
+  70% { transform: translateY(-1px) skewX(-1.5deg); }
+}
+
+@keyframes tunnelBulge {
+  from { transform: translateX(0); }
+  to { transform: translateX(var(--travel)); }
+}
+
+@keyframes bushRustle {
+  0%, 100% { transform: rotate(0deg) skewX(0deg); }
+  12% { transform: rotate(-3deg) skewX(4deg); }
+  28% { transform: rotate(3deg) skewX(-4deg); }
+  44% { transform: rotate(-2deg) skewX(3deg); }
+  60% { transform: rotate(1.4deg) skewX(-2deg); }
+  78% { transform: rotate(-0.6deg) skewX(1deg); }
+}
+
+@keyframes lurk {
+  0%, 100% { transform: skewX(0deg); }
+  30% { transform: skewX(1.2deg); }
+  55% { transform: skewX(-0.8deg); }
+}
+
+@keyframes benchBounce {
+  0%, 100% { transform: translateY(0) scale(1, 1); }
+  15% { transform: translateY(0) scale(1.02, 0.95); }
+  35% { transform: translateY(-5px) scale(0.99, 1.02); }
+  55% { transform: translateY(0) scale(1.01, 0.97); }
+  75% { transform: translateY(-1.5px) scale(1, 1); }
+}
+
+@keyframes pokeRipple {
+  0% { transform: scale(0.2); opacity: 0; }
+  15% { opacity: 0.9; }
+  100% { transform: scale(2.2); opacity: 0; }
+}
+
+@keyframes bobHard {
+  0%, 100% { transform: translateY(0); }
+  20% { transform: translateY(4px); }
+  45% { transform: translateY(-3px); }
+  70% { transform: translateY(1.5px); }
+}
+
+@keyframes lampFlicker {
+  0% { opacity: 0.2; }
+  20% { opacity: 1; }
+  35% { opacity: 0.4; }
+  55% { opacity: 1; }
+  70% { opacity: 0.7; }
+  100% { opacity: 1; }
+}
+
+@keyframes lampWobble {
+  0%, 100% { transform: rotate(0deg); }
+  20% { transform: rotate(-1.6deg); }
+  45% { transform: rotate(1.2deg); }
+  70% { transform: rotate(-0.5deg); }
+}
+
+@keyframes lightPool {
+  from { opacity: 0.85; }
+  to { opacity: 1; }
+}
+
+@keyframes jostle {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  15% { transform: translate(-3px, -4px) rotate(-5deg); }
+  35% { transform: translate(3px, -1px) rotate(4deg); }
+  55% { transform: translate(-1.5px, 0) rotate(-2deg); }
+  75% { transform: translate(0.8px, 0) rotate(1deg); }
+}
+
+@keyframes rattle {
+  0%, 100% { transform: translate(0, 0); }
+  10% { transform: translate(-2px, -1px); }
+  20% { transform: translate(2px, 0); }
+  30% { transform: translate(-2px, -1.5px); }
+  40% { transform: translate(1.5px, 0); }
+  50% { transform: translate(-1.5px, -1px); }
+  60% { transform: translate(1px, 0); }
+  75% { transform: translate(-0.6px, 0); }
+}
+
+@keyframes flowerSway {
+  0%, 100% { transform: skewX(0deg); }
+  14% { transform: skewX(-18deg); }
+  32% { transform: skewX(14deg); }
+  52% { transform: skewX(-8deg); }
+  74% { transform: skewX(4deg); }
+}
+
+@keyframes rockBounce {
+  0% { transform: translateY(0) scale(1, 1); }
+  15% { transform: translateY(0) scale(1.06, 0.92); }
+  40% { transform: translateY(-9px) scale(0.97, 1.04); }
+  65% { transform: translateY(0) scale(1.04, 0.95); }
+  82% { transform: translateY(-2px) scale(1, 1); }
+  100% { transform: translateY(0) scale(1, 1); }
+}
+
+@keyframes blanketRipple {
+  0%, 100% { transform: skewX(0deg) scale(1, 1); }
+  15% { transform: skewX(-4deg) scale(1.02, 0.94); }
+  35% { transform: skewX(3deg) scale(0.99, 1.05); }
+  55% { transform: skewX(-1.5deg) scale(1.01, 0.98); }
+  75% { transform: skewX(0.6deg) scale(1, 1.01); }
+}
+
+@keyframes waterRipple {
+  0% { transform: scale(0.3); opacity: 0; }
+  25% { opacity: 0.8; }
+  100% { transform: scale(1.1); opacity: 0; }
+}
+
+@keyframes kibblePour {
+  0% { transform: translateY(-6px); opacity: 0.4; }
+  60% { transform: translateY(1px); opacity: 1; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .canopyShake, .trunkShake, .canopyRustle, .wobble, .swingHard, .boxJump, .flapLeft, .flapRight, .crinkle, .roll, .tunnelBulge,
+  .bushRustle, .lurk, .benchBounce, .pokeRipple, .bobHard, .lampFlicker, .lampWobble, .lightPool, .jostle, .rattle,
+  .flowerSway, .rockBounce, .blanketRipple, .waterRipple, .kibblePour {
+    animation: none;
+  }
+}

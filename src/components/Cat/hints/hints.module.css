@@ -1,0 +1,23 @@
+.glintingEyes {
+  pointer-events: none;
+}
+
+.blink {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: hintBlink 3.6s ease-in-out infinite;
+}
+
+@keyframes hintBlink {
+  0%,
+  86%,
+  100% {
+    transform: scaleY(1);
+  }
+  90% {
+    transform: scaleY(0.08);
+  }
+  94% {
+    transform: scaleY(1);
+  }
+}

@@ -1,0 +1,64 @@
+.layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 300000;
+  transition: opacity 0.18s ease;
+}
+
+.ringAnchor {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 0;
+}
+
+.ring {
+  position: absolute;
+  left: -15px;
+  top: -15px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.85);
+  outline: 1px solid rgba(24, 40, 22, 0.28);
+  outline-offset: 0;
+  transition: border-color 0.12s ease, background-color 0.16s ease, border-width 0.12s ease;
+}
+
+.ring[data-hovering='true'] {
+  border-width: 1.5px;
+  border-color: rgba(255, 255, 255, 0.95);
+  background-color: rgba(255, 255, 255, 0.16);
+}
+
+.ring[data-armed='true'] {
+  border-color: #f4ff7a;
+  outline-color: rgba(24, 40, 22, 0.55);
+}
+
+.dot {
+  position: absolute;
+  left: -2.5px;
+  top: -2.5px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 0 0 1px rgba(24, 40, 22, 0.35);
+}
+
+.dot[data-tool='laser'],
+.dot[data-tool='wand'] {
+  opacity: 0;
+}
+
+.dot[data-tool='treat'],
+.dot[data-tool='brush'],
+.dot[data-tool='catnip'] {
+  left: -1.5px;
+  top: -1.5px;
+  width: 3px;
+  height: 3px;
+}

@@ -1,0 +1,46 @@
+.anchor {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 240000;
+  pointer-events: none;
+}
+
+.card {
+  display: grid;
+  justify-items: center;
+  gap: 3px;
+  padding: 5px 9px 6px 6px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(32, 48, 31, 0.08);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  color: #20301f;
+  transform-origin: 50% 100%;
+  translate: -50% -100%;
+  white-space: nowrap;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.name {
+  font-size: 12.5px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0.01em;
+}
+
+.mood {
+  display: inline-grid;
+  place-items: center;
+}
+
+.hearts {
+  display: inline-flex;
+  gap: 2px;
+}

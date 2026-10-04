@@ -1,0 +1,33 @@
+.stage {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  isolation: isolate;
+  cursor: none;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  background: #8fbf5a;
+}
+
+.sceneryLayer {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.stage * {
+  cursor: none;
+}
+
+.stage :global([data-cat-id]) > svg {
+  transform-origin: 50% 79%;
+  transition: transform 0.18s ease, filter 0.18s ease;
+}
+
+.stage :global([data-cat-id]):hover > svg {
+  transform: scale(1.04);
+  filter: brightness(1.08);
+}

@@ -1,0 +1,25 @@
+.scenery {
+  position: absolute;
+  inset: 0;
+  display: block;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.cloud {
+  animation-name: drift;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+}
+
+@keyframes drift {
+  from { transform: translateX(-60px); }
+  to { transform: translateX(60px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cloud {
+    animation: none;
+  }
+}

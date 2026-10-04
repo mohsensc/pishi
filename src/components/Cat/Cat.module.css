@@ -1,0 +1,22 @@
+.catRoot {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  will-change: transform;
+}
+
+.shadow {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(34, 52, 20, 0.34) 0%, rgba(34, 52, 20, 0.18) 45%, rgba(34, 52, 20, 0) 72%);
+}
+
+.sprite {
+  position: absolute;
+  overflow: visible;
+  display: block;
+  pointer-events: visiblePainted;
+}

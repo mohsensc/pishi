@@ -1,0 +1,169 @@
+.dock {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  z-index: 260000;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 5px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.84);
+  border: 1px solid rgba(32, 48, 31, 0.08);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transform: translateY(-50%);
+  touch-action: manipulation;
+}
+
+.dock,
+.dock * {
+  cursor: pointer;
+}
+
+.toolButton {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  border: 0;
+  border-radius: 13px;
+  background: transparent;
+  color: #2d3a2a;
+  transition: background-color 0.16s ease, color 0.16s ease, transform 0.16s ease;
+}
+
+.toolButton:hover {
+  background: rgba(32, 48, 31, 0.07);
+}
+
+.toolButton:active {
+  transform: scale(0.94);
+}
+
+.toolButton:focus-visible {
+  outline: 2px solid #20301f;
+  outline-offset: 1px;
+}
+
+.toolButton[data-active='true'] {
+  background: #1f2a1c;
+  color: #ffffff;
+}
+
+.tooltip {
+  position: absolute;
+  left: calc(100% + 10px);
+  top: 50%;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 6px 4px 9px;
+  border-radius: 8px;
+  background: #1f2a1c;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-4px, -50%);
+  transition: opacity 0.14s ease, transform 0.14s ease;
+}
+
+.key {
+  display: inline-grid;
+  place-items: center;
+  min-width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.16);
+  font-family: inherit;
+  font-size: 10px;
+}
+
+.toolButton:hover .tooltip,
+.toolButton:focus-visible .tooltip {
+  opacity: 1;
+  transform: translate(0, -50%);
+}
+
+@media (hover: none) {
+  .tooltip {
+    display: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .dock {
+    left: 10px;
+    top: auto;
+    bottom: calc(10px + env(safe-area-inset-bottom));
+    flex-direction: row;
+    gap: 2px;
+    padding: 4px;
+    border-radius: 16px;
+    transform: none;
+  }
+
+  .toolButton {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+  }
+
+  .tooltip {
+    display: none;
+  }
+}
+
+.divider {
+  align-self: center;
+  width: 22px;
+  height: 1px;
+  margin: 2px 0;
+  background: rgba(32, 48, 31, 0.12);
+}
+
+.addIcon {
+  transition: transform 0.2s ease;
+}
+
+.addIcon[data-open='true'] {
+  transform: rotate(45deg);
+}
+
+.trash {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 13px;
+  border: 1.5px dashed rgba(32, 48, 31, 0.3);
+  color: #2d3a2a;
+  transition: background-color 0.14s ease, border-color 0.14s ease, color 0.14s ease;
+}
+
+.trash[data-over='true'] {
+  border-color: #d2463a;
+  border-style: solid;
+  background: #d2463a;
+  color: #ffffff;
+}
+
+@media (max-width: 640px) {
+  .divider {
+    width: 1px;
+    height: 22px;
+    margin: 0 2px;
+  }
+
+  .trash {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+  }
+}
