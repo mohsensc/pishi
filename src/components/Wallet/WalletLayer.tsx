@@ -1,5 +1,6 @@
 import { memo, useCallback, useEffect, useRef, useState } from 'react'
 import type { DeniedEvent, TokenEvent, Vec } from '../../game/types'
+import { playCoinLanding } from '../../audio/coinStreak'
 import TokenFlights from './TokenFlights'
 import WalletHud from './WalletHud'
 import { inboundFlights, outboundFlights, type FlightSpark, type TokenFlight, type WalletDelta } from './walletFlights'
@@ -58,6 +59,7 @@ function WalletLayer({ wallet, lifetimeEarned, lastMint, lastSpend, lastDenied }
       if (delta) setDeltas((current) => [...current.slice(-4), delta])
       if (!origin || !target) {
         setBumpSignal((signal) => signal + 1)
+        playCoinLanding()
         return
       }
       setBook((current) => {
@@ -97,7 +99,9 @@ function WalletLayer({ wallet, lifetimeEarned, lastMint, lastSpend, lastDenied }
       if (!current.flights.some((candidate) => candidate.id === flight.id)) return current
       return { ...current, flights: current.flights.filter((candidate) => candidate.id !== flight.id), pending: Math.max(0, current.pending - flight.share) }
     })
-    if (flight.direction === 'in') setBumpSignal((signal) => signal + 1)
+    if (flight.direction !== 'in') return
+    setBumpSignal((signal) => signal + 1)
+    playCoinLanding()
   }, [])
 
   const handleSparkDone = useCallback((sparkId: string) => {
