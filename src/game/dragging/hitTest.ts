@@ -6,6 +6,7 @@ import type { DragHit, PropState, Vec, World } from '../types'
 
 const treatReach = 22
 const tallKinds = new Set(['catTree', 'lamppost', 'scratchingPost'])
+const fixedKinds = new Set(['tree'])
 
 function propHitDistance(prop: PropState, point: Vec, worldHeight: number): number | null {
   if (prop.tunnelExit) {
@@ -30,7 +31,7 @@ function propHitDistance(prop: PropState, point: Vec, worldHeight: number): numb
 function hitTestProp(world: World, point: Vec): string | null {
   let best: PropState | null = null
   for (const prop of world.props) {
-    if (propHitDistance(prop, point, world.height) === null) continue
+    if (fixedKinds.has(prop.kind) || propHitDistance(prop, point, world.height) === null) continue
     if (!best || prop.position.y > best.position.y) best = prop
   }
   return best ? best.id : null

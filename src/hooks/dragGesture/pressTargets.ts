@@ -29,9 +29,18 @@ function domHit(element: Element | null): DragHit | null {
   return propId ? { target: 'prop', id: propId } : null
 }
 
+export function catIdAt(element: Element | null): string | null {
+  return element?.closest<HTMLElement>('[data-cat-id]')?.dataset.catId ?? null
+}
+
+function isFixedProp(element: Element | null): boolean {
+  return element?.closest<HTMLElement>('[data-prop-id]')?.dataset.propKind === 'tree' && element.closest('[data-cat-id]') === null
+}
+
 export function resolvePressHit(element: Element | null, point: Vec, actions: WorldActions): DragHit | null {
   const geometric = actions.hitTestDraggable(point)
   if (geometric && (geometric.target === 'ball' || geometric.target === 'treat')) return geometric
+  if (isFixedProp(element)) return geometric
   return domHit(element) ?? geometric
 }
 

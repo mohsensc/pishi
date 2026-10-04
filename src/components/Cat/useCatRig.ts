@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type { CatPose, CatState } from '../../game/types'
 import { hashToUnit } from '../../game/random'
+import { happinessOf } from '../../game/happiness/happiness'
 import { length } from '../../game/vector'
 import type { CatDimensions } from './breedShapes'
 import { blendRig, computeRig, type CatRig } from './rig/computeRig'
@@ -103,6 +104,7 @@ class CatRigAnimator {
       verticalSpeed: cat.verticalSpeed,
       swing: this.secondary.swingAngle,
       affection: cat.affection,
+      happiness: happinessOf(cat),
       drowsiness: cat.drowsiness ?? (groggyBehaviors.has(cat.behavior) ? 0.7 : 0),
     }
     const target = computeRig(input)

@@ -58,7 +58,7 @@ function openDirection(prop: PropState, cat: CatState, context: StepContext, rea
   return { x: random.sign(), y: 0.4 }
 }
 
-export function popOut(cat: CatState, prop: PropState, context: StepContext): void {
+export function popOut(cat: CatState, prop: PropState, context: StepContext, keepHeight = false): void {
   const mind = mindOf(cat, context)
   const wasHeight = cat.height
   cat.hidden = false
@@ -78,7 +78,7 @@ export function popOut(cat: CatState, prop: PropState, context: StepContext): vo
     direction = outward
   }
   cat.position = { x: origin.x, y: origin.y }
-  cat.height = Math.max(wasHeight, hidingHeightOf(prop, context.world.height))
+  cat.height = keepHeight ? wasHeight : Math.max(wasHeight, hidingHeightOf(prop, context.world.height))
   const landing = add(origin, scale(direction, prop.tunnelExit ? reach * 1.3 : reach))
   const peak = 26 + 18 * mind.personality.jumpPower
   startLeap(cat, mind, context, landing, 0, peak, 0.42 + cat.height / 600, 'startle', 'startle')

@@ -5,6 +5,8 @@ import { depthScale, toScreen } from '../../game/projection'
 import AffectionHearts from './AffectionHearts'
 import BreedGlyph from './BreedGlyph'
 import MoodGlyph from './MoodGlyph'
+import HappinessGlyph from '../Happiness/HappinessGlyph'
+import { happinessOf } from '../../game/happiness/happiness'
 import { moodLabels, moodOf } from './catMood'
 import styles from './CatCard.module.css'
 
@@ -37,12 +39,16 @@ function CatCard({ cat, worldHeight }: CatCardProps) {
         transition={{ duration: 0.16, ease: 'easeOut' }}>
         <span className={styles.row}>
           <BreedGlyph coat={cat.coat} />
+          {cat.collar && <span className={styles.collarDot} style={{ background: cat.collar.color }} aria-hidden="true" />}
           <span className={styles.name}>{cat.name}</span>
           <span className={styles.mood} title={moodLabels[mood]}>
             <MoodGlyph mood={mood} />
           </span>
         </span>
-        <AffectionHearts affection={cat.affection} />
+        <span className={styles.row}>
+          <AffectionHearts affection={cat.affection} />
+          <HappinessGlyph happiness={happinessOf(cat)} size={13} />
+        </span>
       </motion.div>
     </div>
   )

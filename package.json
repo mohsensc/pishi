@@ -7,9 +7,11 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "node --import ./server/testing/registerExtensionless.ts --test 'server/**/*.test.ts' 'src/**/*.test.ts'"
   },
   "dependencies": {
+    "@vercel/blob": "^2.8.0",
     "motion": "^13.4.4",
     "react": "^19.2.8",
     "react-dom": "^19.2.8"

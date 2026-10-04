@@ -10,6 +10,8 @@ import { toyHeightAbove } from './support/grab'
 import { chain, gazeAtToy } from './support/phases'
 import { standingReach } from './support/reach'
 import { checkChance } from './support/toolQueries'
+import { wantsTool } from '../../needs/toolNeeds'
+import { requestEagerness } from '../../happiness/happiness'
 
 const attractionRadius = 480
 
@@ -23,8 +25,11 @@ export const gatherAroundBehavior: Behavior = {
   weight: () => 0,
   urgency(cat, mind, context) {
     const tool = contestTool(context)
-    const toy = canJoinToyAttention(cat, mind, context, attractionRadius)
-    if (!tool || !toy || contestIsFull(context, cat.id)) return 0
+    const eager = tool !== null && !cat.asleep && wantsTool(cat, tool)
+    const toy = canJoinToyAttention(cat, mind, context, eager ? attractionRadius * 1.6 : attractionRadius)
+    if (!tool || !toy) return 0
+    if (eager) return checkChance(context, 3.6 * requestEagerness(cat)) ? 5.2 : 0
+    if (contestIsFull(context, cat.id)) return 0
     return checkChance(context, toyInterest(cat, mind, tool)) ? 2.6 : 0
   },
   start(cat, mind, context) {
@@ -56,7 +61,8 @@ export const gatherAroundBehavior: Behavior = {
       chain(cat, mind, context, 'watchOthersJump', 2.2)
       return zeroVector
     }
-    const pace = gap > 120 * context.memory.sizeScale ? 0.62 : 0.36
+    const eager = wantsTool(cat, contestTool(context) ?? 'hand')
+    const pace = gap > 120 * context.memory.sizeScale ? (eager ? 0.9 : 0.62) : eager ? 0.5 : 0.36
     return arrive(cat, spot, topSpeed(cat, mind, context) * pace, 30)
   },
 }

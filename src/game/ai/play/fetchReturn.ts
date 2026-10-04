@@ -1,5 +1,6 @@
 import type { Behavior } from '../behavior'
 import { add, distance, normalize, scale, subtract } from '../../vector'
+import { forgetBallHolder } from '../../care/catchTracking'
 import { offerBall } from '../../dragging/handlingMemory'
 import { releaseBall } from '../helpers/ball'
 import { setEmote } from '../helpers/pose'
@@ -51,7 +52,10 @@ export const fetchReturnBehavior: Behavior = {
     if (gap < reach || mind.behaviorElapsed > 9) {
       const toward = normalize(subtract(destination, cat.position))
       const ball = releaseBall(cat, mind, context, add(scale(toward, 50), { x: 0, y: 10 }), 140, 2.5)
-      if (ball) offerBall(context.world, ball.id, offerSeconds)
+      if (ball) {
+        offerBall(context.world, ball.id, offerSeconds)
+        forgetBallHolder(context.world, ball.id)
+      }
       setEmote(cat, cat.affection > 0.5 ? 'love' : 'playful')
       enterPhase(mind, 'wait', context.memory.random.range(1.4, 2.8))
       return brake(cat)

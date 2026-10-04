@@ -15,6 +15,7 @@ import CatHead from './CatHead'
 import CatLeg from './CatLeg'
 import CatTail from './CatTail'
 import styles from './Cat.module.css'
+import { happinessOf } from '../../game/happiness/happiness'
 
 interface CatProps {
   cat: CatState
@@ -59,7 +60,7 @@ function blinkAmount(time: number, phase: number, content: boolean): number {
 
 function isContent(cat: CatState): boolean {
   if (contentPoses.has(cat.pose) || cat.action === 'purr') return true
-  return cat.pose === 'sit' && cat.affection > 0.7
+  return (cat.pose === 'sit' || cat.pose === 'loaf') && (cat.affection > 0.7 || happinessOf(cat) > 0.72)
 }
 
 function pupilDirection(cat: CatState): Vec {
@@ -166,6 +167,7 @@ function CatSprite({ cat, worldHeight }: CatProps) {
       data-leap={cat.leapStyle ?? undefined}
       data-holding={cat.heldBallId ?? undefined}
       data-prop={cat.propId ?? undefined}
+      data-collared={cat.collar ? 'true' : undefined}
       data-screen-x={Math.round(floorPoint.x)}
       data-screen-y={Math.round(floorPoint.y)}
       style={{ transform: `translate3d(${floorPoint.x}px, ${floorPoint.y}px, 0)`, zIndex }}>
@@ -208,6 +210,7 @@ function CatSprite({ cat, worldHeight }: CatProps) {
             eyeOpen={eyeOpen}
             mouthItem={mouthItem}
             clipId={`catHead${instanceId}`}
+            collarColor={cat.collar?.color ?? null}
           />
         </g>
       </svg>

@@ -1,12 +1,13 @@
 import { beginBehavior } from './ai/helpers/transitions'
 import { catSizeScale, clampToBounds, createLawnMapper, lawnBounds, viewportScale } from './bounds'
 import { breedProfiles } from './catalog'
-import { BALL_RADIUS, WORLD_SEED } from './constants'
-import { createPropLayout, rescaleProps } from './layout'
+import { BALL_RADIUS } from './constants'
+import { refitProps, rescaleProps } from './layout'
 import { createMind, type EngineMemory } from './memory'
 import type { Vec, World } from './types'
 import { idleContext, memoryFor } from './engine'
 import { isOpenSpot, openSpot } from './spawning'
+import { depthScale } from './projection'
 
 function releaseEveryone(world: World, memory: EngineMemory, mapPoint: (point: Vec) => Vec): void {
   const bounds = lawnBounds(world.width, world.height)
@@ -66,12 +67,16 @@ export function resizeWorld(world: World, width: number, height: number): void {
   const needsFreshLayout = scaleRatio < 0.88 || scaleRatio > 1.14 || aspectRatioChange < 0.8 || aspectRatioChange > 1.25
   const catScaleRatio = catSizeScale(nextWidth, nextHeight) / catSizeScale(world.width, world.height)
   if (needsFreshLayout) {
-    world.props = createPropLayout(nextWidth, nextHeight, WORLD_SEED)
+    world.props = refitProps(world.props, world.width, world.height, nextWidth, nextHeight, memory.random)
   } else {
     rescaleProps(world.props, world.width, world.height, nextWidth, nextHeight)
   }
   world.width = nextWidth
   world.height = nextHeight
+  world.landscape.felled = world.landscape.felled.map((felled) => {
+    const position = mapPoint(felled.position)
+    return { ...felled, position, radius: felled.radius * scaleRatio, scale: depthScale(position.y, nextHeight) }
+  })
   memory.sizeScale = viewportScale(nextWidth, nextHeight)
   memory.speedScale = Math.pow(memory.sizeScale, 0.7)
   if (Math.abs(catScaleRatio - 1) > 0.01) {

@@ -1,31 +1,37 @@
-import type { PropKind, Vec } from './types'
+import { depthScale } from './projection'
+import type { PropState, Vec } from './types'
 
-export interface Footprint {
+export const CANOPY_DEPTH_OFFSET = 400
+
+export interface CanopyEllipse {
   center: Vec
-  radius: number
+  radiusX: number
+  radiusY: number
 }
 
-export interface TallColumn {
-  base: Vec
-  halfWidth: number
-  reach: number
+const canopyRise = 6.4
+const canopySpanX = 3.2
+const canopySpanY = 2.7
+
+export function canopyEllipseOf(tree: PropState, worldHeight: number): CanopyEllipse {
+  const drawScale = depthScale(tree.position.y, worldHeight)
+  return {
+    center: { x: tree.position.x, y: tree.position.y - tree.radius * canopyRise * drawScale },
+    radiusX: tree.radius * canopySpanX * drawScale,
+    radiusY: tree.radius * canopySpanY * drawScale,
+  }
 }
 
-export interface PlacedFootprint {
-  footprint: Footprint
-  gap: number
-  column: TallColumn | null
+export function canopyReach(canopy: CanopyEllipse, screenPoint: Vec): number {
+  return Math.hypot((screenPoint.x - canopy.center.x) / canopy.radiusX, (screenPoint.y - canopy.center.y) / canopy.radiusY)
 }
 
-export function tallColumnOf(kind: PropKind, position: Vec, sizeScale: number): TallColumn | null {
-  if (kind === 'lamppost') return { base: position, halfWidth: 22 * sizeScale, reach: 170 * sizeScale }
-  if (kind === 'tree') return { base: position, halfWidth: 70 * sizeScale, reach: 200 * sizeScale }
-  if (kind === 'catTree') return { base: position, halfWidth: 44 * sizeScale, reach: 130 * sizeScale }
-  return null
+export function isBehindCanopy(tree: PropState, screenPoint: Vec, groundY: number, worldHeight: number, margin = 0.85): boolean {
+  if (tree.kind !== 'tree' || groundY >= tree.position.y + CANOPY_DEPTH_OFFSET) return false
+  return canopyReach(canopyEllipseOf(tree, worldHeight), screenPoint) < margin
 }
 
-export function isOccluding(column: TallColumn | null, footprint: Footprint): boolean {
-  if (!column) return false
-  const behind = footprint.center.y < column.base.y && footprint.center.y > column.base.y - column.reach
-  return behind && Math.abs(footprint.center.x - column.base.x) < column.halfWidth + footprint.radius
+export function isUnderCanopy(props: readonly PropState[], point: Vec, worldHeight: number, height = 0, margin = 0.85): boolean {
+  const screenPoint = { x: point.x, y: point.y - height }
+  return props.some((prop) => isBehindCanopy(prop, screenPoint, point.y, worldHeight, margin))
 }

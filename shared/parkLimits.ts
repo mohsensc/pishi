@@ -1,0 +1,11 @@
+export const WALLET_MAX = 99_999
+export const LIFETIME_MAX = 9_999_999
+export const MAX_PURCHASED_PROPS = 40
+export const MAX_TREES = 64
+export const MAX_COLLARS_BOUGHT = 64
+export const MAX_EARN_PER_SECOND = 3
+export const MAX_EARN_WINDOW_SECONDS = 30 * 60
+export const MIGRATION_GRANT_MAX = 150
+export const PATH_COLUMNS = 32
+export const PATH_ROWS = 18
+export const PATH_CELL_COUNT = PATH_COLUMNS * PATH_ROWS

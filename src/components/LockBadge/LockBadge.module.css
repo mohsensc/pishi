@@ -1,0 +1,35 @@
+.badge {
+  position: absolute;
+  right: 1px;
+  bottom: 1px;
+  pointer-events: none;
+}
+
+.plate {
+  fill: #ffffff;
+}
+
+.track {
+  fill: none;
+  stroke: rgba(32, 48, 31, 0.12);
+  stroke-width: 1.6;
+}
+
+.fill {
+  fill: none;
+  stroke: #8db32a;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.4s ease;
+}
+
+.shackle {
+  fill: none;
+  stroke: #4a5646;
+  stroke-width: 1.1;
+  stroke-linecap: round;
+}
+
+.body {
+  fill: #4a5646;
+}

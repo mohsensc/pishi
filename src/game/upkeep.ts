@@ -14,6 +14,7 @@ import type { BallState, World } from './types'
 import { holdsPop } from './dragging'
 import { classifyCatch } from './care/catchTracking'
 import { grantCatchReward } from './care/inventory'
+import { isSupplyBall, mintCatchTokens } from './economy/minting'
 import { exciteCats } from './liveliness'
 
 export function popBall(context: StepContext, ball: BallState): void {
@@ -26,7 +27,11 @@ export function popBall(context: StepContext, ball: BallState): void {
   memory.popSerial += 1
   world.pops.push({ id: `pop-${memory.popSerial}`, position: { x: ball.position.x, y: ball.position.y }, time: world.time })
   world.poppedCount += 1
-  grantCatchReward(context, classifyCatch(world, ball))
+  const catchKind = classifyCatch(world, ball)
+  if (isSupplyBall(world, ball.id)) {
+    const minted = mintCatchTokens(context, catchKind, ball.id)
+    grantCatchReward(context, catchKind, minted.minted)
+  }
   exciteCats(world)
   world.cats.forEach((cat) => {
     if (distance(cat.position, ball.position) < POP_STARTLE_RADIUS * memory.sizeScale) startleCat(cat, context, ball.position)

@@ -14,6 +14,7 @@ import { add, clamp, distance, normalize, scale, subtract } from './vector'
 import type { CatState, Vec, World } from './types'
 import { interactionContext } from './engine'
 import { pokeSleeper } from './needs/sleepControl'
+import { happinessOf, isUnhappy } from './happiness/happiness'
 
 type CatReaction = 'headbutt' | 'hiss' | 'roll' | 'hop'
 
@@ -31,8 +32,9 @@ export function pokeProp(world: World, propId: string, point: Vec): void {
 function reactionFor(cat: CatState, mind: CatMind, context: StepContext): CatReaction {
   const personality = mind.personality
   const random = context.memory.random
-  if (cat.affection > 0.62 && random.chance(0.4 + cat.affection * 0.4)) return 'headbutt'
-  if (cat.coat.breed === 'persian' || random.chance(personality.spookResistance * 0.5)) return 'hiss'
+  const fondness = Math.max(cat.affection, happinessOf(cat) - 0.1)
+  if (fondness > 0.62 && random.chance(0.4 + fondness * 0.4)) return 'headbutt'
+  if (cat.coat.breed === 'persian' || random.chance(personality.spookResistance * 0.5 + (isUnhappy(cat) ? 0.3 : 0))) return 'hiss'
   if (random.chance(personality.zoominess * personality.boldness * 1.4)) return 'roll'
   return 'hop'
 }

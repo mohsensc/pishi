@@ -3,7 +3,7 @@ import { DRAG_START_DISTANCE } from '../game/constants'
 import { distance } from '../game/vector'
 import type { DragHit, PointerState, Vec } from '../game/types'
 import type { WorldActions } from './useWorld'
-import { isInterfaceElement, isOverDiscardZone, paintedElementAt, pokeAt, resolvePressHit } from './dragGesture/pressTargets'
+import { catIdAt, isInterfaceElement, isOverDiscardZone, paintedElementAt, pokeAt, resolvePressHit } from './dragGesture/pressTargets'
 
 interface PressRecord {
   pointerId: number
@@ -33,7 +33,7 @@ function isDiscardable(hit: DragHit | null): boolean {
   return hit !== null && (hit.target === 'prop' || hit.target === 'ball')
 }
 
-export function useDragGesture(actions: WorldActions, pointerRef: RefObject<PointerState>, enabled: boolean): DragGesture {
+export function useDragGesture(actions: WorldActions, pointerRef: RefObject<PointerState>, enabled: boolean, onCatTap?: (catId: string) => void): DragGesture {
   const pressRef = useRef<PressRecord | null>(null)
   const [overDiscard, setOverDiscard] = useState(false)
 
@@ -98,11 +98,15 @@ export function useDragGesture(actions: WorldActions, pointerRef: RefObject<Poin
         else actions.endDrag(point, pointerVelocity())
       } else if (!press.moved) {
         if (press.touch && press.hit?.target === 'ball') actions.tapBall(press.hit.id)
-        else pokeAt(press.element, point, actions)
+        else {
+          pokeAt(press.element, point, actions)
+          const catId = catIdAt(press.element) ?? (press.hit?.target === 'cat' ? press.hit.id : null)
+          if (catId && onCatTap) onCatTap(catId)
+        }
       }
       finishPress(event)
     },
-    [actions, finishPress, pointerVelocity],
+    [actions, finishPress, onCatTap, pointerVelocity],
   )
 
   const onPointerCancel = useCallback(

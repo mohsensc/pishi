@@ -3,15 +3,19 @@ import { beginBehavior } from './ai/helpers/transitions'
 import { boundsCenter, clampToBounds, lawnBounds, type LawnBounds } from './bounds'
 import { ejectStashesIn } from './ai/helpers/ball'
 import { popOutAll } from './ai/helpers/hiding'
-import { BALL_COUNT, BALL_RADIUS, MAX_EXTRA_TOYS, MAX_PROPS } from './constants'
+import { BALL_COUNT, BALL_RADIUS, MAX_EXTRA_TOYS } from './constants'
 import { freeSpotFor } from './dragging/freeSpot'
 import { spawnEffect } from './effects'
 import { interactionContext } from './engine'
 import { createPropState, recipeFor } from './layout'
 import { type EngineMemory, type StepContext } from './memory'
 import { isInPond } from './physics'
+import { isUnderCanopy } from './layoutOcclusion'
 import { distance, lerpVec } from './vector'
 import type { BallKind, BallState, PropKind, PropState, Vec, World } from './types'
+import { registerSupplyBall } from './economy/minting'
+import { MAX_PURCHASED_PROPS } from './economy/economyConstants'
+import { purchasedPropCount } from './economy/pricing'
 
 export function isOpenSpot(props: PropState[], point: Vec, clearance: number): boolean {
   if (isInPond(props, point, 1.2)) return false
@@ -24,14 +28,24 @@ export function isOpenSpot(props: PropState[], point: Vec, clearance: number): b
   })
 }
 
+export function isClearGround(world: World, point: Vec, clearance: number): boolean {
+  return isOpenSpot(world.props, point, clearance) && !isUnderCanopy(world.props, point, world.height)
+}
+
 export function openSpot(world: World, memory: EngineMemory, clearance: number, avoid: Vec[] = [], spacing = 0): Vec {
   const bounds = lawnBounds(world.width, world.height, 6)
   let fallback = boundsCenter(bounds)
-  for (let attempt = 0; attempt < 60; attempt += 1) {
+  let fallbackShaded = true
+  for (let attempt = 0; attempt < 90; attempt += 1) {
     const point = { x: memory.random.range(bounds.left, bounds.right), y: memory.random.range(bounds.top, bounds.bottom) }
     if (!isOpenSpot(world.props, point, clearance)) continue
-    fallback = point
-    if (avoid.every((other) => distance(other, point) > spacing * (attempt < 40 ? 1 : 0.5))) return point
+    const shaded = isUnderCanopy(world.props, point, world.height)
+    if (fallbackShaded || !shaded) {
+      fallback = point
+      fallbackShaded = shaded
+    }
+    if (shaded && attempt < 70) continue
+    if (avoid.every((other) => distance(other, point) > spacing * (attempt < 50 ? 1 : 0.5))) return point
   }
   return fallback
 }
@@ -59,7 +73,9 @@ export function spawnBalls(world: World, memory: EngineMemory, count: number, dr
   return Array.from({ length: count }, (_, index) => {
     const position = openSpot(world, memory, BALL_RADIUS + 6, spots, 120 * memory.sizeScale)
     spots.push(position)
-    return createBall(memory, 'tennis', position, dropped ? memory.random.range(140, 280) : 0, String(index))
+    const ball = createBall(memory, 'tennis', position, dropped ? memory.random.range(140, 280) : 0, String(index))
+    registerSupplyBall(world, ball.id)
+    return ball
   })
 }
 
@@ -100,7 +116,7 @@ function nearestOpenSpot(world: World, point: Vec, clearance: number, bounds: La
 }
 
 export function isPropCapReached(world: World): boolean {
-  return world.props.length >= MAX_PROPS
+  return purchasedPropCount(world) >= MAX_PURCHASED_PROPS
 }
 
 export function isToyCapReached(world: World): boolean {
@@ -108,7 +124,7 @@ export function isToyCapReached(world: World): boolean {
 }
 
 export function spawnProp(world: World, kind: PropKind, point: Vec): string | null {
-  if (isPropCapReached(world) || kind === 'feedingStation') return null
+  if ((kind !== 'tree' && isPropCapReached(world)) || kind === 'feedingStation') return null
   const context = interactionContext(world)
   const recipe = recipeFor(kind, context.memory.sizeScale, context.memory.random)
   const requested = nearestOpenSpot(world, point, recipe.radius + 8, context.bounds)

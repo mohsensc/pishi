@@ -67,7 +67,6 @@ export const DAY_LENGTH_SECONDS = 360
 
 export const DRAG_START_DISTANCE = 6
 export const DRAG_LIFT: Record<DragTarget, number> = { prop: 26, cat: 38, ball: 30, treat: 24 }
-export const MAX_PROPS = 40
 export const MAX_EXTRA_TOYS = 12
 export const FOLLOW_DURATION = 10
 export const CAT_CARD_DELAY = 0.6

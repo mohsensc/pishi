@@ -1,22 +1,83 @@
-import type { SpawnableItem } from '../../game/types'
+import type { ShopItemId } from '../../game/types'
 
-export interface DrawerEntry {
-  key: string
-  item: SpawnableItem
+export type ShopTab = 'static' | 'moving' | 'water' | 'care'
+
+export interface ShopTabEntry {
+  tab: ShopTab
   label: string
+  items: ShopItemId[]
 }
 
-export const drawerEntries: DrawerEntry[] = [
-  { key: 'cushion', item: { category: 'prop', kind: 'cushion' }, label: 'Cushion' },
-  { key: 'cardboardBox', item: { category: 'prop', kind: 'cardboardBox' }, label: 'Box' },
-  { key: 'catTree', item: { category: 'prop', kind: 'catTree' }, label: 'Cat tree' },
-  { key: 'scratchingPost', item: { category: 'prop', kind: 'scratchingPost' }, label: 'Scratching post' },
-  { key: 'yarnBasket', item: { category: 'prop', kind: 'yarnBasket' }, label: 'Yarn basket' },
-  { key: 'foodBowl', item: { category: 'prop', kind: 'foodBowl' }, label: 'Food bowl' },
-  { key: 'bench', item: { category: 'prop', kind: 'bench' }, label: 'Bench' },
-  { key: 'rock', item: { category: 'prop', kind: 'rock' }, label: 'Rock' },
-  { key: 'bush', item: { category: 'prop', kind: 'bush' }, label: 'Bush' },
-  { key: 'flowerBed', item: { category: 'prop', kind: 'flowerBed' }, label: 'Flowers' },
-  { key: 'tennis', item: { category: 'toy', kind: 'tennis' }, label: 'Tennis ball' },
-  { key: 'mouse', item: { category: 'toy', kind: 'mouse' }, label: 'Toy mouse' },
+export const shopTabs: ShopTabEntry[] = [
+  {
+    tab: 'static',
+    label: 'Furniture',
+    items: ['rock', 'cushion', 'cardboardBox', 'flowerBed', 'sapling', 'foodBowl', 'yarnBasket', 'scratchingPost', 'bush', 'picnicBlanket', 'bench', 'lamppost', 'tunnel', 'catTree'],
+  },
+  { tab: 'moving', label: 'Moving', items: ['pinwheel', 'springToy', 'birdFeeder', 'swing', 'butterflyHouse', 'sprinkler', 'windmill', 'bubbleMachine'] },
+  { tab: 'water', label: 'Water', items: ['birdbath', 'pond', 'fountain'] },
+  { tab: 'care', label: 'Care', items: ['careFish', 'careMilk', 'toyMouse', 'careYarn', 'careBrush', 'careTreat'] },
 ]
+
+export const shopItemLabels: Record<string, string> = {
+  rock: 'Rock',
+  cushion: 'Cushion',
+  cardboardBox: 'Box',
+  flowerBed: 'Flowers',
+  sapling: 'Sapling',
+  foodBowl: 'Food bowl',
+  yarnBasket: 'Yarn basket',
+  scratchingPost: 'Scratching post',
+  bush: 'Bush',
+  picnicBlanket: 'Picnic blanket',
+  bench: 'Bench',
+  lamppost: 'Lamp',
+  tunnel: 'Tunnel',
+  catTree: 'Cat tree',
+  pinwheel: 'Pinwheel',
+  springToy: 'Spring toy',
+  birdFeeder: 'Bird feeder',
+  swing: 'Swing',
+  butterflyHouse: 'Butterfly house',
+  sprinkler: 'Sprinkler',
+  windmill: 'Windmill',
+  bubbleMachine: 'Bubble machine',
+  birdbath: 'Birdbath',
+  pond: 'Pond',
+  fountain: 'Fountain',
+  careFish: 'Fish',
+  careMilk: 'Milk',
+  toyMouse: 'Toy mouse',
+  careYarn: 'Yarn',
+  careBrush: 'Brush',
+  careTreat: 'Treat',
+  collar: 'Collar',
+}
+
+export const ghostHeights: Record<string, number> = {
+  rock: 34,
+  cushion: 28,
+  cardboardBox: 62,
+  flowerBed: 34,
+  tree: 170,
+  foodBowl: 22,
+  yarnBasket: 44,
+  scratchingPost: 84,
+  bush: 62,
+  picnicBlanket: 18,
+  bench: 64,
+  lamppost: 210,
+  tunnel: 52,
+  catTree: 170,
+  pinwheel: 84,
+  springToy: 64,
+  birdFeeder: 136,
+  swing: 128,
+  butterflyHouse: 112,
+  sprinkler: 30,
+  windmill: 236,
+  bubbleMachine: 66,
+  birdbath: 62,
+  pond: 30,
+  fountain: 112,
+}

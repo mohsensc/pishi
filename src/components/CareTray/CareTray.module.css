@@ -143,6 +143,125 @@
   animation: deny 0.36s ease;
 }
 
+.item {
+  position: relative;
+}
+
+.item[data-wanted='true']::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: 3px;
+  width: 5px;
+  height: 5px;
+  margin-left: -2.5px;
+  border-radius: 50%;
+  background: #e9a92a;
+  animation: wanted 1.6s ease-in-out infinite;
+}
+
+.collar {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  flex: none;
+  touch-action: none;
+}
+
+.collar[data-ready='false'][data-affordable='true'] .collarGlyph,
+.collar[data-buying='true'] .collarGlyph {
+  opacity: 0.85;
+  filter: none;
+}
+
+.collar[data-ready='false']:hover {
+  background: rgba(32, 48, 31, 0.05);
+}
+
+.collarFill[data-tier-locked='true'] {
+  stroke: #8db32a;
+}
+
+.collarPrice {
+  position: absolute;
+  left: 50%;
+  bottom: -6px;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.collar[data-ready='true'] {
+  background: rgba(233, 169, 42, 0.16);
+  box-shadow: inset 0 0 0 1.5px rgba(233, 169, 42, 0.7);
+}
+
+.collar[data-ready='true']:hover {
+  background: rgba(233, 169, 42, 0.26);
+}
+
+.collar[data-armed='true'] {
+  background: #ffffff;
+  box-shadow: inset 0 0 0 2px #1f2a1c;
+}
+
+.collar[data-armed='true'] svg {
+  animation: hover 0.9s ease-in-out infinite;
+}
+
+.collar[data-dragging='true'] {
+  opacity: 0.3;
+}
+
+.collar[data-denied='true'] {
+  animation: deny 0.36s ease;
+}
+
+.collarRing {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+  overflow: visible;
+}
+
+.collarFill {
+  fill: none;
+  stroke: #e9a92a;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+}
+
+.collarGlyph {
+  display: grid;
+  place-items: center;
+  opacity: 0.3;
+  filter: grayscale(1);
+}
+
+.ghost[data-over-trash='true'] svg {
+  scale: 0.8;
+  opacity: 0.6;
+}
+
+@keyframes wanted {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.5);
+    opacity: 0.6;
+  }
+}
+
 .openSlot {
   width: 7px;
   height: 7px;
@@ -158,7 +277,6 @@
   top: 10px;
   z-index: 300000;
   pointer-events: none;
-  transition: scale 0.14s ease;
 }
 
 .ghost[data-dragging='true'] {
@@ -171,7 +289,11 @@
   animation: hover 0.9s ease-in-out infinite;
 }
 
-.ghost[data-over-cat='true'] {
+.ghost svg {
+  transition: scale 0.14s ease, opacity 0.14s ease;
+}
+
+.ghost[data-over-cat='true'] svg {
   scale: 1.18;
 }
 
@@ -241,13 +363,21 @@
   .openSlot {
     margin: 0 2px;
   }
+
+  .collar {
+    width: 38px;
+    height: 38px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .ghost svg,
   .item[data-armed='true'] svg,
   .meter[data-full='true'] .meterBall,
-  .item[data-denied='true'] {
+  .item[data-denied='true'],
+  .item[data-wanted='true']::after,
+  .collar[data-armed='true'] svg,
+  .collar[data-denied='true'] {
     animation: none;
   }
 }

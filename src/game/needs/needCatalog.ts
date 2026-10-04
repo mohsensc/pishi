@@ -9,7 +9,7 @@ export const NEED_RETRY_DELAY: SecondsRange = [3, 8]
 export const NEED_QUIET_AFTER_GIFT: SecondsRange = [40, 70]
 export const NEED_PATIENCE: SecondsRange = [50, 70]
 export const MAX_AWAKE_NEEDY_CATS = 3
-export const MIN_AWAKE_CATS = 2
+export const MIN_AWAKE_CATS = 4
 export const DROWSY_START_URGE = 0.5
 export const MAX_AWAKE_DROWSINESS = 0.85
 

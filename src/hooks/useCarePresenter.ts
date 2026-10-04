@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useMemo, useRef, type RefObject } from 'react'
-import type { CareItemKind, Vec } from '../game/types'
+import type { TrayItemKind, Vec } from '../game/types'
 import type { WorldActions } from './useWorld'
 
 export interface CarePresenter {
-  present: (kind: CareItemKind, clientPoint: Vec) => boolean
-  probe: (clientPoint: Vec | null) => string | null
+  present: (kind: TrayItemKind, clientPoint: Vec) => boolean
+  probe: (clientPoint: Vec | null, kind?: TrayItemKind | null) => string | null
 }
 
 const targetAttribute = 'data-care-target'
@@ -23,39 +23,52 @@ function markTarget(stage: HTMLElement | null, catId: string | null): void {
   stage.querySelector(`[data-cat-id="${CSS.escape(catId)}"]`)?.setAttribute(targetAttribute, 'true')
 }
 
-export function useCarePresenter(stageRef: RefObject<HTMLElement | null>, actions: WorldActions): CarePresenter {
+export function useCarePresenter(stageRef: RefObject<HTMLElement | null>, actions: WorldActions, onCollarFitted: (catId: string) => void): CarePresenter {
   const markedRef = useRef<string | null>(null)
 
-  const resolveCat = useCallback(
-    (clientPoint: Vec): string | null => {
+  const stagePoint = useCallback(
+    (clientPoint: Vec): Vec | null => {
       const stage = stageRef.current
       if (!stage) return null
       const bounds = stage.getBoundingClientRect()
-      const geometric = actions.careTargetAt({ x: clientPoint.x - bounds.left, y: clientPoint.y - bounds.top })
-      return geometric ?? catIdFromDom(clientPoint)
+      return { x: clientPoint.x - bounds.left, y: clientPoint.y - bounds.top }
     },
-    [actions, stageRef],
+    [stageRef],
+  )
+
+  const resolveCat = useCallback(
+    (clientPoint: Vec, kind: TrayItemKind | null): string | null => {
+      const point = stagePoint(clientPoint)
+      if (!point) return null
+      return actions.careTargetAt(point, kind) ?? catIdFromDom(clientPoint)
+    },
+    [actions, stagePoint],
   )
 
   const probe = useCallback(
-    (clientPoint: Vec | null): string | null => {
-      const catId = clientPoint ? resolveCat(clientPoint) : null
+    (clientPoint: Vec | null, kind: TrayItemKind | null = null): string | null => {
+      const catId = clientPoint ? resolveCat(clientPoint, kind) : null
+      actions.offerCareItem(clientPoint ? kind : null, clientPoint ? stagePoint(clientPoint) : null)
       if (catId !== markedRef.current) {
         markedRef.current = catId
         markTarget(stageRef.current, catId)
       }
       return catId
     },
-    [resolveCat, stageRef],
+    [actions, resolveCat, stagePoint, stageRef],
   )
 
   const present = useCallback(
-    (kind: CareItemKind, clientPoint: Vec): boolean => {
-      const catId = resolveCat(clientPoint)
+    (kind: TrayItemKind, clientPoint: Vec): boolean => {
+      const catId = resolveCat(clientPoint, kind)
       probe(null)
-      return catId !== null && actions.presentCareItem(catId, kind)
+      if (catId === null) return false
+      if (kind !== 'collar') return actions.presentCareItem(catId, kind)
+      if (!actions.fitCollar(catId)) return false
+      onCollarFitted(catId)
+      return true
     },
-    [actions, probe, resolveCat],
+    [actions, onCollarFitted, probe, resolveCat],
   )
 
   useEffect(() => () => markTarget(stageRef.current, null), [stageRef])

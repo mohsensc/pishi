@@ -2,6 +2,7 @@ import type { CatCoat } from '../../game/types'
 
 interface BreedGlyphProps {
   coat: CatCoat
+  size?: number
 }
 
 function earPaths(breed: CatCoat['breed']): string {
@@ -10,11 +11,11 @@ function earPaths(breed: CatCoat['breed']): string {
   return 'M5.2 10 5.8 3.8 10.2 6.8M18.8 10 18.2 3.8 13.8 6.8'
 }
 
-export default function BreedGlyph({ coat }: BreedGlyphProps) {
+export default function BreedGlyph({ coat, size = 20 }: BreedGlyphProps) {
   const fluffy = coat.breed === 'persian'
   const outline = 'rgba(32, 48, 31, 0.35)'
   return (
-    <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true">
+    <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden="true">
       <path d={earPaths(coat.breed)} fill={coat.baseColor} stroke={outline} strokeWidth={1} strokeLinejoin="round" />
       <ellipse cx="12" cy={13.4} rx={fluffy ? 8.4 : 7.4} ry={fluffy ? 7 : 6.6} fill={coat.baseColor} stroke={outline} strokeWidth={1} />
       {coat.pattern === 'tuxedo' && <path d="M8.6 20c.6-2.6 1.8-4 3.4-4s2.8 1.4 3.4 4z" fill={coat.patchColor} />}

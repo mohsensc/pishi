@@ -44,3 +44,9 @@
   display: inline-flex;
   gap: 2px;
 }
+
+.collarDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}

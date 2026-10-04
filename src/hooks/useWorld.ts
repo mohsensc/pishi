@@ -1,14 +1,23 @@
 import { useEffect, useMemo, useRef, useState, type RefObject } from 'react'
-import type { BallKind, CareItemKind, DragHit, DragTarget, PointerState, PropKind, Vec, World } from '../game/types'
+import type { CareItemKind, CatBreed, DragHit, DragTarget, PathStyle, PointerState, ShopItemId, ToolKind, TrayItemKind, Vec, World } from '../game/types'
 import { createIdlePointer } from '../game/pointer'
 import { createWorld, stepWorld } from '../game/world'
 import { resizeWorld } from '../game/resize'
 import { pokeCat, pokeGround, pokeProp } from '../game/interactions'
 import { beginDrag, discardDrag, endDrag, guardBall, hitTestDraggable, setBallCatching, tapBall, updateDrag } from '../game/dragging'
-import { removeProp, spawnLooseToy, spawnProp } from '../game/spawning'
+import { interactionContext } from '../game/engine'
+import { purchase } from '../game/economy/purchase'
+import { discardProp } from '../game/economy/refund'
+import type { PurchaseResult, RefundResult } from '../game/economy/economyTypes'
+import { removeTree, type TreeRemovalResult } from '../game/landscape/treeRemoval'
+import { erasePath, paintPath, type PathPaintResult } from '../game/landscape/pathBuilding'
 import { shakeTreatBag, summonCat } from '../game/calls'
 import { BALL_COUNT, CAT_COUNT } from '../game/constants'
 import { careTargetAt, offerCareItem } from '../game/care/careActions'
+import { discardCareItem } from '../game/care/inventory'
+import { setCareOffer } from '../game/care/careOffer'
+import { fitCollar, greetCollaredCat, renameCat } from '../game/collar/collar'
+import { isToolOwned, progressOf } from '../game/progress/progress'
 import type { ViewportSize } from './useViewportSize'
 import { useAnimationFrame } from './useAnimationFrame'
 
@@ -35,6 +44,9 @@ function snapshotWorld(world: World): World {
       : null,
     treatBagShake: world.treatBagShake ? { ...world.treatBagShake, position: { ...world.treatBagShake.position } } : null,
     care: { ...world.care, inventory: world.care.inventory.map((item) => ({ ...item })), lastReward: world.care.lastReward ? { ...world.care.lastReward } : null },
+    progress: { ...progressOf(world) },
+    economy: { ...world.economy },
+    landscape: { ...world.landscape },
   }
 }
 
@@ -55,13 +67,21 @@ export interface WorldActions {
   guardBall: (ballId: string | null) => void
   tapBall: (ballId: string) => boolean
   discardDrag: () => boolean
-  spawnProp: (kind: PropKind, point: Vec) => string | null
-  removeProp: (propId: string) => boolean
-  spawnLooseToy: (kind: BallKind, point: Vec) => string | null
+  purchase: (itemId: ShopItemId, point: Vec | null) => PurchaseResult
+  discardProp: (propId: string) => RefundResult
+  removeTree: (propId: string) => TreeRemovalResult
+  paintPath: (style: PathStyle, cells: readonly number[]) => PathPaintResult
+  erasePath: (cells: readonly number[]) => number[]
   summonCat: (catId: string, point: Vec) => void
   shakeTreatBag: (point: Vec) => void
-  careTargetAt: (point: Vec) => string | null
+  careTargetAt: (point: Vec, kind?: TrayItemKind | null) => string | null
   presentCareItem: (catId: string, kind: CareItemKind) => boolean
+  discardCareItem: (itemId: string) => boolean
+  discardCollar: () => boolean
+  ownsTool: (tool: ToolKind) => boolean
+  offerCareItem: (kind: TrayItemKind | null, point: Vec | null) => void
+  fitCollar: (catId: string) => boolean
+  renameCat: (catId: string, name: string, breed: CatBreed) => boolean
 }
 
 interface WorldView {
@@ -73,16 +93,25 @@ interface WorldHandle extends WorldView {
   actions: WorldActions
 }
 
-export function useWorld(viewportSize: ViewportSize, pointerRef: RefObject<PointerState>): WorldHandle {
+export interface WorldSource {
+  createWorld: (viewport: ViewportSize) => World
+  attach?: (readLiveWorld: () => World) => () => void
+}
+
+export function useWorld(viewportSize: ViewportSize, pointerRef: RefObject<PointerState>, worldSource?: WorldSource): WorldHandle {
   const [liveWorld] = useState<World>(() =>
-    createWorld({
-      width: viewportSize.width,
-      height: viewportSize.height,
-      catCount: CAT_COUNT,
-      ballCount: BALL_COUNT,
-    }),
+    worldSource
+      ? worldSource.createWorld(viewportSize)
+      : createWorld({
+          width: viewportSize.width,
+          height: viewportSize.height,
+          catCount: CAT_COUNT,
+          ballCount: BALL_COUNT,
+        }),
   )
   const worldRef = useRef<World>(liveWorld)
+
+  useEffect(() => worldSource?.attach?.(() => worldRef.current), [worldSource])
   const [worldView, setWorldView] = useState<WorldView>(() => ({
     world: snapshotWorld(liveWorld),
     pointer: createIdlePointer(),
@@ -104,7 +133,9 @@ export function useWorld(viewportSize: ViewportSize, pointerRef: RefObject<Point
   const actions = useMemo<WorldActions>(
     () => ({
       pokeProp: (propId, point) => pokeProp(worldRef.current, propId, point),
-      pokeCat: (catId, point) => pokeCat(worldRef.current, catId, point),
+      pokeCat: (catId, point) => {
+        if (!greetCollaredCat(worldRef.current, catId, point)) pokeCat(worldRef.current, catId, point)
+      },
       pokeGround: (point) => pokeGround(worldRef.current, point),
       hitTestDraggable: (point) => hitTestDraggable(worldRef.current, point),
       beginDrag: (target, id, point) => beginDrag(worldRef.current, target, id, point),
@@ -118,13 +149,21 @@ export function useWorld(viewportSize: ViewportSize, pointerRef: RefObject<Point
       guardBall: (ballId) => guardBall(worldRef.current, ballId),
       tapBall: (ballId) => tapBall(worldRef.current, ballId),
       discardDrag: () => discardDrag(worldRef.current),
-      spawnProp: (kind, point) => spawnProp(worldRef.current, kind, point),
-      removeProp: (propId) => removeProp(worldRef.current, propId),
-      spawnLooseToy: (kind, point) => spawnLooseToy(worldRef.current, kind, point),
+      purchase: (itemId, point) => purchase(interactionContext(worldRef.current), itemId, { point }),
+      discardProp: (propId) => discardProp(interactionContext(worldRef.current), propId),
+      removeTree: (propId) => removeTree(interactionContext(worldRef.current), propId),
+      paintPath: (style, cells) => paintPath(interactionContext(worldRef.current), style, cells),
+      erasePath: (cells) => erasePath(interactionContext(worldRef.current), cells),
       summonCat: (catId, point) => summonCat(worldRef.current, catId, point),
       shakeTreatBag: (point) => shakeTreatBag(worldRef.current, point),
-      careTargetAt: (point) => careTargetAt(worldRef.current, point),
+      careTargetAt: (point, kind = null) => careTargetAt(worldRef.current, point, kind),
       presentCareItem: (catId, kind) => offerCareItem(worldRef.current, catId, kind),
+      discardCareItem: (itemId) => discardCareItem(worldRef.current, itemId),
+      discardCollar: () => false,
+      ownsTool: (tool) => isToolOwned(worldRef.current, tool),
+      offerCareItem: (kind, point) => setCareOffer(worldRef.current, kind, point),
+      fitCollar: (catId) => fitCollar(worldRef.current, catId),
+      renameCat: (catId, name, breed) => renameCat(worldRef.current, catId, name, breed),
     }),
     [],
   )

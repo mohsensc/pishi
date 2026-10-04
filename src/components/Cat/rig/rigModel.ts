@@ -54,6 +54,7 @@ export interface RigInput {
   swing: number
   affection: number
   drowsiness: number
+  happiness: number
 }
 
 export type RigApplier = (rig: CatRig, input: RigInput) => void

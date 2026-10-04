@@ -9,7 +9,6 @@ import { catSizeScale, lawnBounds } from './bounds'
 import { createButterflies, stepButterflies } from './butterflies'
 import { createCatProfiles } from './catalog'
 import { BUTTERFLY_COUNT, CAT_COUNT, MAX_HIDDEN_CATS, MIN_VISIBLE_CATS, POP_LIFETIME, WORLD_SEED } from './constants'
-import { createPropLayout } from './layout'
 import { createMind, type StepContext } from './memory'
 import { stepBallPhysics } from './physics'
 import { isFiniteVec } from './vector'
@@ -22,12 +21,22 @@ import { stepLiveliness } from './liveliness'
 import { createCareState } from './care/inventory'
 import { trackBallHolders } from './care/catchTracking'
 import { stepNeeds } from './needs/needStep'
+import { createProgressState, usableTool } from './progress/progress'
+import { initialHappiness } from './happiness/happiness'
+import { stepHappiness } from './happiness/happinessStep'
+import { createEconomyState } from './economy/economyState'
+import { stepEconomy } from './economy/economyStep'
+import { createLandscapeState } from './landscape/landscapeState'
+import { createFreshParkProps } from './landscape/freshPark'
+import { stepLandscape } from './landscape/landscapeStep'
+import { stepShopItems } from './shopItems/shopItemStep'
 
 export function createWorld(config: WorldConfig): World {
   const width = Math.max(1, config.width)
   const height = Math.max(1, config.height)
-  const memory = createMemory(WORLD_SEED, width, height)
-  const props = createPropLayout(width, height, WORLD_SEED)
+  const seed = config.seed ?? WORLD_SEED
+  const memory = createMemory(seed, width, height)
+  const props = createFreshParkProps(width, height, seed)
   const world: World = {
     width,
     height,
@@ -46,6 +55,9 @@ export function createWorld(config: WorldConfig): World {
     pops: [],
     poppedCount: 0,
     care: createCareState(),
+    progress: createProgressState(),
+    economy: createEconomyState(),
+    landscape: createLandscapeState(),
   }
   const catCount = Math.max(config.catCount || CAT_COUNT, MIN_VISIBLE_CATS + MAX_HIDDEN_CATS)
   const profiles = createCatProfiles(catCount, memory.random, catSizeScale(width, height))
@@ -90,6 +102,8 @@ export function createWorld(config: WorldConfig): World {
       need: null,
       needUrge: 0,
       asleep: false,
+      happiness: initialHappiness(memory.random),
+      collar: null,
     }
   })
   startInitialBehaviors(idleContext(world, memory))
@@ -115,15 +129,19 @@ export function stepWorld(world: World, dt: number, pointer: PointerState): Worl
       velocity: { x: pointer.velocity.x, y: pointer.velocity.y },
       active: pointer.active && isFiniteVec(pointer.position),
       pressed: pointer.pressed,
-      tool: pointer.tool,
+      tool: usableTool(world, pointer.tool),
     },
     bounds: lawnBounds(world.width, world.height),
     library: behaviorLibrary,
   }
   memory.lastPointer = context.pointer
   stepBallSupply(context)
+  stepEconomy(context)
+  stepLandscape(context)
+  stepShopItems(context)
   stepLiveliness(context)
   stepNeeds(context)
+  stepHappiness(context)
   maintainStashes(context)
   const motionSamples = sampleMotion(world)
   world.cats.forEach((cat) => {

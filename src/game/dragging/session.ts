@@ -1,7 +1,8 @@
 import { DRAG_LIFT } from '../constants'
 import { interactionContext } from '../engine'
 import { toScreen } from '../projection'
-import { removeLooseToy, removeProp } from '../spawning'
+import { removeLooseToy } from '../spawning'
+import { discardProp } from '../economy/refund'
 import { subtract } from '../vector'
 import type { CatState, DragState, DragTarget, Vec, World } from '../types'
 import { prepareGrab } from './grabbing'
@@ -16,7 +17,7 @@ const scruffHeight = 34
 
 function grabbableOf(world: World, target: DragTarget, id: string): Grabbable | undefined {
   if (target === 'prop') {
-    const prop = world.props.find((candidate) => candidate.id === id)
+    const prop = world.props.find((candidate) => candidate.id === id && candidate.kind !== 'tree')
     return prop ? { position: prop.position, height: prop.lift } : undefined
   }
   if (target === 'cat') return world.cats.find((candidate) => candidate.id === id && !candidate.hidden)
@@ -88,7 +89,7 @@ export function discardDrag(world: World): boolean {
   const drag = world.drag
   if (!drag) return false
   if (drag.target === 'prop' || drag.target === 'ball') {
-    const removed = drag.target === 'prop' ? removeProp(world, drag.id) : removeLooseToy(world, drag.id)
+    const removed = drag.target === 'prop' ? discardProp(interactionContext(world), drag.id).ok : removeLooseToy(world, drag.id)
     if (removed) {
       world.drag = null
       return true

@@ -1,11 +1,11 @@
-import { createLawnMapper, lawnBounds, lawnTopEdge, viewportScale } from './bounds'
+import { clampToBounds, createLawnMapper, lawnBounds, viewportScale } from './bounds'
 import { CAT_TREE_LEVELS, CAT_TREE_PLATFORM_OFFSETS } from './constants'
-import { horizontalGapToParkPath } from './parkPath'
 import { depthScale } from './projection'
-import { createRandom, type Random } from './random'
-import { distance, lerpVec } from './vector'
+import type { Random } from './random'
+import { clamp } from './vector'
 import type { PropKind, PropState, Vec } from './types'
-import { isOccluding, tallColumnOf, type Footprint, type PlacedFootprint } from './layoutOcclusion'
+import { shopItemCanHide, shopItemRecipe, shopItemSolidHeight } from './shopItems/shopItemRecipes'
+import { isShopPropKind } from './shopItems/shopPropKinds'
 
 export interface PropRecipe {
   kind: PropKind
@@ -17,10 +17,9 @@ export interface PropRecipe {
   gap: number
 }
 
-const essentialKinds = new Set<PropKind>(['catTree', 'cardboardBox', 'tunnel', 'pond'])
-
 export function recipeFor(kind: PropKind, sizeScale: number, random: Random): PropRecipe {
   const scaled = (value: number) => value * sizeScale
+  if (isShopPropKind(kind)) return shopItemRecipe(kind, sizeScale)
   switch (kind) {
     case 'catTree':
       return { kind, radius: scaled(38), solid: true, perchHeight: Math.max(100, scaled(135)), canStash: false, topClearance: Math.max(100, scaled(135)) + 20, gap: scaled(40) }
@@ -71,7 +70,7 @@ export function createPropState(id: string, recipe: PropRecipe, position: Vec, e
     variant,
     occupantIds: [],
     tunnelExit: exit,
-    canHide: hidingKinds.has(recipe.kind),
+    canHide: hidingKinds.has(recipe.kind) || (isShopPropKind(recipe.kind) && shopItemCanHide(recipe.kind)),
     agitation: 0,
     pokedAt: null,
     lit: false,
@@ -83,93 +82,8 @@ export function createPropState(id: string, recipe: PropRecipe, position: Vec, e
   }
 }
 
-function feedingStationFootprint(width: number, height: number, sizeScale: number, random: Random): { recipe: PropRecipe; position: Vec } {
-  const recipe = recipeFor('feedingStation', sizeScale, random)
-  const bounds = lawnBounds(width, height, 8)
-  const position = { x: bounds.right - recipe.radius * 1.2, y: bounds.bottom - recipe.radius * 0.75 }
-  return { recipe, position }
-}
-
-function layoutPlan(width: number, height: number): PropKind[] {
-  const compact = width < 700 || width * height < 520000
-  const roomy = width * height > 1300000
-  if (compact) {
-    return [
-      'pond', 'catTree', 'catTree', 'tunnel', 'tree', 'cardboardBox', 'cardboardBox', 'cardboardBox',
-      'bench', 'picnicBlanket', 'bush', 'bush', 'bush', 'flowerBed', 'rock', 'rock', 'yarnBasket',
-      'scratchingPost', 'foodBowl', 'lamppost',
-    ]
-  }
-  return [
-    'pond', 'catTree', 'catTree', 'catTree', 'tunnel', 'tunnel', 'tree', 'tree', 'cardboardBox', 'cardboardBox',
-    'cardboardBox', 'cardboardBox', 'bench', 'bench', 'picnicBlanket', 'bush', 'bush', 'bush', 'bush', 'bush',
-    ...(roomy ? (['bush', 'rock'] as PropKind[]) : []),
-    'flowerBed', 'flowerBed', 'flowerBed', 'rock', 'rock', 'rock', 'yarnBasket', 'scratchingPost', 'scratchingPost',
-    'foodBowl', 'foodBowl', 'lamppost',
-  ]
-}
-
-function footprintOf(recipe: PropRecipe, position: Vec, exit: Vec | null): Footprint {
-  if (exit) {
-    return {
-      center: lerpVec(position, exit, 0.5),
-      radius: distance(position, exit) / 2 + recipe.radius,
-    }
-  }
-  return { center: position, radius: recipe.radius }
-}
-
-export function createPropLayout(width: number, height: number, seed: number): PropState[] {
-  const random = createRandom(seed ^ 0x5bd1e995)
-  const sizeScale = viewportScale(width, height)
-  const bounds = lawnBounds(width, height, 8)
-  const lawnHeight = bounds.bottom - bounds.top
-  const openAreas: Footprint[] = [
-    { center: { x: width * 0.5, y: bounds.top + lawnHeight * 0.55 }, radius: Math.min(width, lawnHeight) * 0.13 },
-    { center: { x: width * 0.24, y: bounds.top + lawnHeight * 0.78 }, radius: Math.min(width, lawnHeight) * 0.09 },
-    { center: { x: width * 0.78, y: bounds.top + lawnHeight * 0.3 }, radius: Math.min(width, lawnHeight) * 0.09 },
-  ]
-  const station = feedingStationFootprint(width, height, sizeScale, random)
-  const placed: PlacedFootprint[] = [{ footprint: { center: station.position, radius: station.recipe.radius }, gap: station.recipe.gap, column: null }]
-  const props: PropState[] = [createPropState('prop-feedingStation', station.recipe, station.position, null, 0)]
-
-  layoutPlan(width, height).forEach((kind, index) => {
-    const recipe = recipeFor(kind, sizeScale, random)
-    const tunnelLength = kind === 'tunnel' ? 150 * sizeScale : 0
-    for (let attempt = 0; attempt < 140; attempt += 1) {
-      const relax = attempt > 90 ? 0.6 : 1
-      const top = Math.max(bounds.top + recipe.radius * 0.6, lawnTopEdge(height) + recipe.topClearance)
-      const minX = bounds.left + recipe.radius
-      const maxX = bounds.right - recipe.radius - tunnelLength
-      const minY = top
-      const maxY = bounds.bottom - recipe.radius * 0.6
-      if (maxX <= minX || maxY <= minY) return
-      const position = { x: random.range(minX, maxX), y: random.range(minY, maxY) }
-      const exit = kind === 'tunnel' ? { x: position.x + tunnelLength, y: Math.min(maxY, Math.max(minY, position.y + random.range(-0.25, 0.25) * tunnelLength)) } : null
-      const footprint = footprintOf(recipe, position, exit)
-      const collides = placed.some(
-        (other) => distance(other.footprint.center, footprint.center) < other.footprint.radius + footprint.radius + Math.max(other.gap, recipe.gap) * relax,
-      )
-      if (collides) continue
-      const column = tallColumnOf(kind, position, sizeScale)
-      const hidden = placed.some((other) => isOccluding(other.column, footprint) || isOccluding(column, other.footprint))
-      if (hidden && attempt < 120) continue
-      const pathClearance = kind === 'tree' ? recipe.radius * 3 : kind === 'catTree' ? recipe.radius * 1.7 : recipe.radius * 1.25
-      const pathProbes = exit ? [position, exit, footprint.center] : [position]
-      const onPath = pathProbes.some((probe) => horizontalGapToParkPath(probe, width, height, lawnTopEdge(height)) < pathClearance + 10)
-      if (onPath && (attempt < 130 || !essentialKinds.has(kind))) continue
-      const blocksOpenArea =
-        recipe.radius > 14 && openAreas.some((area) => distance(area.center, footprint.center) < area.radius + footprint.radius * 0.8)
-      if (blocksOpenArea && attempt < 120) continue
-      placed.push({ footprint, gap: recipe.gap, column })
-      props.push(createPropState(`prop-${kind}-${index}`, recipe, position, exit, random.integer(0, 2)))
-      return
-    }
-  })
-  return props
-}
-
 export function propSolidHeight(prop: PropState): number {
+  if (isShopPropKind(prop.kind)) return shopItemSolidHeight(prop.kind)
   switch (prop.kind) {
     case 'catTree':
       return prop.perchHeight
@@ -201,6 +115,24 @@ export function rescaleProps(props: PropState[], oldWidth: number, oldHeight: nu
   props.forEach((prop) => {
     prop.position = mapPoint(prop.position)
     if (prop.tunnelExit) prop.tunnelExit = mapPoint(prop.tunnelExit)
+  })
+}
+
+export function refitProps(props: PropState[], oldWidth: number, oldHeight: number, width: number, height: number, random: Random): PropState[] {
+  const mapPoint = createLawnMapper(oldWidth, oldHeight, width, height)
+  const bounds = lawnBounds(width, height)
+  const sizeScale = viewportScale(width, height)
+  const sizeRatio = sizeScale / viewportScale(oldWidth, oldHeight)
+  return props.map((prop) => {
+    const recipe = recipeFor(prop.kind, sizeScale, random)
+    return {
+      ...prop,
+      position: clampToBounds(mapPoint(prop.position), bounds),
+      tunnelExit: prop.tunnelExit ? clampToBounds(mapPoint(prop.tunnelExit), bounds) : null,
+      radius: clamp(prop.radius * sizeRatio, recipe.radius * 0.5, recipe.radius * 2),
+      perchHeight: recipe.perchHeight,
+      occupantIds: [],
+    }
   })
 }
 

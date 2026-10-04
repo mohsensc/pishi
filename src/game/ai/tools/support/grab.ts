@@ -5,6 +5,7 @@ import type { CatState, HeldToyState } from '../../../types'
 import { setAction, setEmote } from '../../helpers/pose'
 import { raiseAffection } from './affection'
 import { grabRadius } from './reach'
+import { satisfyByTool } from '../../../needs/toolNeeds'
 
 export function usableToy(context: StepContext, tool: JumpTool): HeldToyState | null {
   const toy = context.world.heldToy
@@ -26,6 +27,7 @@ function toyWithinReach(cat: CatState, toy: HeldToyState, topOffset: number, bot
 function claimToy(cat: CatState, toy: HeldToyState, context: StepContext): void {
   const { world } = context
   clearMisses(world, cat.id)
+  satisfyByTool(cat, context, toy.tool)
   if (toy.tool === 'treat') {
     toy.snatchedAt = world.time
     setAction(cat, 'catchTreat')

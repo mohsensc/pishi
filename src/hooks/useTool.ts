@@ -7,26 +7,36 @@ function isTypingTarget(target: EventTarget | null): boolean {
   return target instanceof HTMLElement && (target.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName))
 }
 
-export function useTool(pointerRef: RefObject<PointerState>): { tool: ToolKind; selectTool: (tool: ToolKind) => void } {
-  const [tool, setTool] = useState<ToolKind>('hand')
+export function useTool(
+  pointerRef: RefObject<PointerState>,
+  ownedTools: readonly ToolKind[],
+  ownsTool: (tool: ToolKind) => boolean,
+): { tool: ToolKind; selectTool: (tool: ToolKind) => void } {
+  const [chosenTool, setTool] = useState<ToolKind>('hand')
+  const tool = chosenTool === 'hand' || ownedTools.includes(chosenTool) ? chosenTool : 'hand'
 
   useEffect(() => {
     pointerRef.current.tool = tool
   }, [tool, pointerRef])
 
-  const selectTool = useCallback((next: ToolKind) => setTool(next), [])
+  const selectTool = useCallback(
+    (next: ToolKind) => {
+      if (next === 'hand' || ownsTool(next)) setTool(next)
+    },
+    [ownsTool],
+  )
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.metaKey || event.ctrlKey || event.altKey || isTypingTarget(event.target)) return
       const index = Number(event.key) - 1
       const next = toolOrder[index]
-      if (next) setTool(next)
+      if (next) selectTool(next)
       if (event.key === 'Escape') setTool('hand')
     }
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [])
+  }, [selectTool])
 
   return { tool, selectTool }
 }
