@@ -1,0 +1,57 @@
+.toggle {
+  position: absolute;
+  right: 16px;
+  top: 14px;
+  z-index: 250000;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.84);
+  border: 1px solid rgba(32, 48, 31, 0.08);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: #20301f;
+  cursor: pointer;
+  touch-action: manipulation;
+  transition: background-color 0.16s ease, color 0.16s ease, transform 0.16s ease;
+}
+
+.toggle::before {
+  content: '';
+  position: absolute;
+  inset: -6px;
+  border-radius: 999px;
+}
+
+.toggle:hover {
+  background: rgba(255, 255, 255, 0.96);
+}
+
+.toggle:active {
+  transform: scale(0.93);
+}
+
+.toggle:focus-visible {
+  outline: 2px solid #20301f;
+  outline-offset: 2px;
+}
+
+.toggle[data-muted='true'] {
+  color: rgba(32, 48, 31, 0.5);
+}
+
+@media (max-width: 640px) {
+  .toggle {
+    right: 10px;
+    top: 67px;
+    width: 30px;
+    height: 30px;
+  }
+
+  .toggle::before {
+    inset: -7px;
+  }
+}

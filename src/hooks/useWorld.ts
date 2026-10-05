@@ -20,6 +20,7 @@ import { fitCollar, greetCollaredCat, renameCat } from '../game/collar/collar'
 import { isToolOwned, progressOf } from '../game/progress/progress'
 import type { ViewportSize } from './useViewportSize'
 import { useAnimationFrame } from './useAnimationFrame'
+import { createWorldSoundObserver } from '../audio/worldSoundObserver'
 
 function snapshotWorld(world: World): World {
   return {
@@ -110,6 +111,7 @@ export function useWorld(viewportSize: ViewportSize, pointerRef: RefObject<Point
         }),
   )
   const worldRef = useRef<World>(liveWorld)
+  const [soundObserver] = useState(createWorldSoundObserver)
 
   useEffect(() => worldSource?.attach?.(() => worldRef.current), [worldSource])
   const [worldView, setWorldView] = useState<WorldView>(() => ({
@@ -127,6 +129,7 @@ export function useWorld(viewportSize: ViewportSize, pointerRef: RefObject<Point
   useAnimationFrame((deltaSeconds) => {
     if (deltaSeconds <= 0) return
     worldRef.current = stepWorld(worldRef.current, Math.min(deltaSeconds, 1 / 30), pointerRef.current)
+    soundObserver.observe(worldRef.current)
     setWorldView({ world: snapshotWorld(worldRef.current), pointer: snapshotPointer(pointerRef.current) })
   })
 
@@ -134,7 +137,10 @@ export function useWorld(viewportSize: ViewportSize, pointerRef: RefObject<Point
     () => ({
       pokeProp: (propId, point) => pokeProp(worldRef.current, propId, point),
       pokeCat: (catId, point) => {
-        if (!greetCollaredCat(worldRef.current, catId, point)) pokeCat(worldRef.current, catId, point)
+        const world = worldRef.current
+        const wasAsleep = world.cats.some((cat) => cat.id === catId && cat.asleep)
+        if (!greetCollaredCat(world, catId, point)) pokeCat(world, catId, point)
+        soundObserver.noteCatPoke(world, catId, wasAsleep)
       },
       pokeGround: (point) => pokeGround(worldRef.current, point),
       hitTestDraggable: (point) => hitTestDraggable(worldRef.current, point),
@@ -157,15 +163,23 @@ export function useWorld(viewportSize: ViewportSize, pointerRef: RefObject<Point
       summonCat: (catId, point) => summonCat(worldRef.current, catId, point),
       shakeTreatBag: (point) => shakeTreatBag(worldRef.current, point),
       careTargetAt: (point, kind = null) => careTargetAt(worldRef.current, point, kind),
-      presentCareItem: (catId, kind) => offerCareItem(worldRef.current, catId, kind),
-      discardCareItem: (itemId) => discardCareItem(worldRef.current, itemId),
+      presentCareItem: (catId, kind) => {
+        const presented = offerCareItem(worldRef.current, catId, kind)
+        if (presented) soundObserver.noteCareGiven(worldRef.current, catId, kind)
+        return presented
+      },
+      discardCareItem: (itemId) => {
+        const discarded = discardCareItem(worldRef.current, itemId)
+        if (discarded) soundObserver.noteTrayDiscard()
+        return discarded
+      },
       discardCollar: () => false,
       ownsTool: (tool) => isToolOwned(worldRef.current, tool),
       offerCareItem: (kind, point) => setCareOffer(worldRef.current, kind, point),
       fitCollar: (catId) => fitCollar(worldRef.current, catId),
       renameCat: (catId, name, breed) => renameCat(worldRef.current, catId, name, breed),
     }),
-    [],
+    [soundObserver],
   )
 
   return { ...worldView, actions }

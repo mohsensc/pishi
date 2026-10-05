@@ -48,6 +48,8 @@ import LandscapeTools from '../Landscape/LandscapeTools'
 import { useBuildMode } from '../../hooks/useBuildMode'
 import CareTray from '../CareTray/CareTray'
 import NeedBubbles from '../NeedBubble/NeedBubbles'
+import SoundToggle from '../SoundToggle/SoundToggle'
+import { playSound } from '../../audio/soundEngine'
 import styles from './Park.module.css'
 
 interface ParkProps {
@@ -61,6 +63,7 @@ const interactableSelector = '[data-cat-id], [data-prop-id]'
 const interfaceSelector = 'button, [data-ui]'
 const skyTimeSteps = 900
 const nameTagMs = 2600
+const nameTagSoundDelay = 0.22
 
 interface NameTagRecord {
   catId: string
@@ -141,13 +144,14 @@ export default function Park({ viewportSize, worldSource }: ParkProps) {
   const nameTagTimerRef = useRef<number | null>(null)
   const showNameTag = useCallback((catId: string) => {
     setNameTag({ catId, shownAt: performance.now() })
+    playSound('nameTag', { delay: nameTagSoundDelay })
     if (nameTagTimerRef.current !== null) window.clearTimeout(nameTagTimerRef.current)
     nameTagTimerRef.current = window.setTimeout(() => setNameTag(null), nameTagMs)
   }, [])
   const discardTrayItem = useCallback((item: TrayEntry) => (item.kind === 'collar' ? actions.discardCollar() : actions.discardCareItem(item.id)), [actions])
   const finishNaming = (name: string, breed: CatBreed) => {
     if (namingCatId) {
-      actions.renameCat(namingCatId, name, breed)
+      if (actions.renameCat(namingCatId, name, breed)) playSound('nameConfirm')
       showNameTag(namingCatId)
     }
     setNamingCatId(null)
@@ -263,6 +267,7 @@ export default function Park({ viewportSize, worldSource }: ParkProps) {
         onBuy={buyItem}
         refundPreview={refundPreviewFor(world)}
       />
+      <SoundToggle />
       {namingCat && <NamingDialog key={namingCat.id} cat={namingCat} onDone={finishNaming} />}
       <Cursor pointerRef={pointerRef} tool={tool} hovering={hovering || world.drag !== null} nearBall={proximity > armedProximity} pressed={pointer.pressed} />
     </div>
