@@ -1,3 +1,3 @@
 # [play in da cat town](https://pishi.town)
 
-[![pishi demo](media/pishi-demo.webp)](media/pishi-demo.mp4)
+https://github.com/user-attachments/assets/a8c6cc8f-4190-456e-b4fd-d229c0c1d48d
